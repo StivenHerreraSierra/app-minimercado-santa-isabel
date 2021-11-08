@@ -1,6 +1,5 @@
 <template>
   <v-bottom-navigation
-    hide-on-scroll
     horizontal
     fixed
   >

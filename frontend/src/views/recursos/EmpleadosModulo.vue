@@ -14,6 +14,24 @@
     </v-form>
 
     <Grid :items="items" :buttons="buttons" />
+
+    <v-row>
+        <v-col>
+    <v-fab-transition>
+        <v-btn
+            fab
+            fixed
+            large
+            color="blue"
+            bottom
+            right
+            class="floated-btn"
+            >
+                <v-icon large color="white">mdi-account-plus</v-icon>
+        </v-btn>
+    </v-fab-transition>
+    </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -77,5 +95,8 @@ export default {
 };
 </script>
 
-<style>
+<style scope>
+.floated-btn {
+    margin-bottom: 50px;
+}
 </style>

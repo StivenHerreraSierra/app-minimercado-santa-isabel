@@ -1,6 +1,6 @@
 <template>
   <v-layout class="d-flex column pa-8">
-    <Empleados class="pl-4 pr-4" v-if="mostrarEmpleados"/>
+    <Empleados class="pl-4 pr-4 mb-10" v-if="mostrarEmpleados"/>
 
     <BottomMenu v-bind:items="items" class="fixed" v-on:click="setEstado"/>
   </v-layout>
