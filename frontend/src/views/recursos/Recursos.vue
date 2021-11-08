@@ -8,7 +8,7 @@
 
 <script>
 import BottomMenu from "../../components/BottomMenu.vue";
-import Empleados from "./EmpleadosModulo.vue";
+import Empleados from "../../components/recursos/EmpleadosModulo.vue";
 
 export default {
   components: {
