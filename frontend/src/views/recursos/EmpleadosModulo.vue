@@ -13,7 +13,7 @@
       </v-container>
     </v-form>
 
-    <Grid :items="empleados" :buttons="buttons" />
+    <Grid :items="empleados" :buttons="buttons" v-on:eventoTarjeta="identificarEvento" />
 
     <v-row>
       <v-col>
@@ -28,9 +28,9 @@
 </template>
 
 <script>
-import Grid from "../GridContainer.vue";
-import Buscador from "../BuscadorForm.vue";
-import { getEmpleados } from '../../services/recursos/empleados.service';
+import Grid from "../../components/GridContainer.vue";
+import Buscador from "../../components/BuscadorForm.vue";
+import { getEmpleados, removeEmpleado } from '../../services/recursos/empleados.service';
 
 export default {
   components: {
@@ -43,19 +43,22 @@ export default {
 
       buttons: [
         {
-          accion: "teléfonos",
+          nombre: "Ver teléfonos",
           icono: "mdi-cellphone-sound",
           color: "black",
+          accion: "verTelefonos"
         },
         {
-          accion: "editar",
+          nombre: "Editar",
           icono: "mdi-pencil",
           color: "black",
+          accion: "editar"
         },
         {
-          accion: "eliminar",
+          nombre: "Eliminar",
           icono: "mdi-delete",
           color: "black",
+          accion: "eliminar"
         },
       ],
 
@@ -67,6 +70,26 @@ export default {
     buscar(texto) {
       console.log("Buscar empleado:", texto);
     },
+    identificarEvento(boton, empleado) {
+      if(boton.accion === "verTelefonos") {
+        console.log("Evento no disponible");
+      } else if(boton.accion === "editar") {
+        console.log("Evento no disponible");
+      } else if(boton.accion === "eliminar") {
+        this.eliminarEmpleado(empleado);
+      }
+    },
+    eliminarEmpleado(empleado) {
+      let cedula = empleado.cedula;
+
+      removeEmpleado(cedula)
+        .then(res => {
+          console.log("respuesta", res.data);
+
+          this.empleados = this.empleados.filter((empleado) => empleado.cedula != cedula);
+        })
+        .catch(err => console.error("Error", err.error));
+    }
   },
 
   mounted() {

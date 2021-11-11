@@ -6,6 +6,7 @@ module.exports = class Empleado {
 
         connection.query(sql, (error, results) => {
             if(error) throw error;
+
             res.status(200).json(results);
         });
     }
@@ -38,13 +39,19 @@ module.exports = class Empleado {
     }
 
     static delete(req, res) {
-        const { cedula } = req.params;
+        const cedula = req.params.cedula.trim();
         const sql = `DELETE FROM Empleado WHERE cedula=${cedula}`
 
-        connection.query(sql, error => {
-            if(error) throw error;
+        if(cedula.length > 0) {
+            connection.query(sql, (error, result) => {
+                if(error) throw error;
 
-            res.status(200).json({ "message": "Empleado eliminado" });
-        })
+                if(result.affectedRows == 0) res.status(400).send({ error: 'No se encontró un empleado con esa cédula' });
+
+                res.status(200).json({ "message": "Empleado eliminado" });
+            });
+        } else {
+            res.status(400).send({ error: "La cédula no puede ser vacía" });
+        }
     }
 }
