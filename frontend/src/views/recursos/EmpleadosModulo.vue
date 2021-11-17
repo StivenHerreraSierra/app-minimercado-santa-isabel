@@ -13,16 +13,44 @@
       </v-container>
     </v-form>
 
-    <Grid :items="empleados" :buttons="buttons" v-on:eventoTarjeta="identificarEvento" />
+    <Grid
+      :items="empleados"
+      :buttons="buttons"
+      v-on:eventoTarjeta="identificarEvento"
+    />
 
-    <v-row>
-      <v-col>
-        <v-fab-transition>
-          <v-btn fab fixed large color="blue" bottom right class="floated-btn">
-            <v-icon large color="white">mdi-account-plus</v-icon>
-          </v-btn>
-        </v-fab-transition>
-      </v-col>
+    <v-row justify="center">
+      <v-dialog v-model="dialog" :esEdit="esEdit" persistent max-width="50%">
+        <template v-slot:activator="{ on, attrs }">
+          <v-fab-transition>
+            <v-btn
+              fab
+              fixed
+              large
+              color="blue"
+              bottom
+              right
+              class="floated-btn"
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon large color="white">mdi-account-plus</v-icon>
+            </v-btn>
+          </v-fab-transition>
+        </template>
+
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Registrar empleado</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container>
+              <FormularioEmpleado :esEdit="esEdit" />
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-row>
   </v-container>
 </template>
@@ -30,35 +58,44 @@
 <script>
 import Grid from "../../components/GridContainer.vue";
 import Buscador from "../../components/BuscadorForm.vue";
-import { getEmpleados, removeEmpleado } from '../../services/recursos/empleados.service';
+import FormularioEmpleado from "./FormularioEmpleado.vue";
+import {
+  getEmpleados,
+  removeEmpleado,
+} from "../../services/recursos/empleados.service";
 
 export default {
   components: {
     Grid,
     Buscador,
+    FormularioEmpleado,
   },
   data() {
     return {
       empleados: [],
+
+      dialog: false,
+
+      esEdit: false,
 
       buttons: [
         {
           nombre: "Ver teléfonos",
           icono: "mdi-cellphone-sound",
           color: "black",
-          accion: "verTelefonos"
+          accion: "verTelefonos",
         },
         {
           nombre: "Editar",
           icono: "mdi-pencil",
           color: "black",
-          accion: "editar"
+          accion: "editar",
         },
         {
           nombre: "Eliminar",
           icono: "mdi-delete",
           color: "black",
-          accion: "eliminar"
+          accion: "eliminar",
         },
       ],
 
@@ -71,11 +108,11 @@ export default {
       console.log("Buscar empleado:", texto);
     },
     identificarEvento(boton, empleado) {
-      if(boton.accion === "verTelefonos") {
+      if (boton.accion === "verTelefonos") {
         console.log("Evento no disponible");
-      } else if(boton.accion === "editar") {
-        console.log("Evento no disponible");
-      } else if(boton.accion === "eliminar") {
+      } else if (boton.accion === "editar") {
+        this.mostrarFormularioEdicion(empleado);
+      } else if (boton.accion === "eliminar") {
         this.eliminarEmpleado(empleado);
       }
     },
@@ -83,19 +120,27 @@ export default {
       let cedula = empleado.cedula;
 
       removeEmpleado(cedula)
-        .then(res => {
+        .then((res) => {
           console.log("respuesta", res.data);
 
-          this.empleados = this.empleados.filter((empleado) => empleado.cedula != cedula);
+          this.empleados = this.empleados.filter(
+            (empleado) => empleado.cedula != cedula
+          );
         })
-        .catch(err => console.error("Error", err.error));
+        .catch((err) => console.error("Error", err.error));
+    },
+    mostrarFormularioEdicion(empleado) {
+      localStorage.setItem("empleadoEdit", JSON.stringify(empleado));
+
+      this.esEdit = true;
+      this.dialog = true;
     }
   },
 
   mounted() {
-      getEmpleados()
-        .then(response => this.empleados = response.data)
-        .catch(error => console.error(error));
+    getEmpleados()
+      .then((response) => (this.empleados = response.data))
+      .catch((error) => console.error(error));
   },
 };
 </script>
