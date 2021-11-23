@@ -58,7 +58,7 @@
 <script>
 import Grid from "../../components/GridContainer.vue";
 import Buscador from "../../components/BuscadorForm.vue";
-import FormularioEmpleado from "./FormularioEmpleado.vue";
+import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
 import {
   getEmpleados,
   removeEmpleado,
