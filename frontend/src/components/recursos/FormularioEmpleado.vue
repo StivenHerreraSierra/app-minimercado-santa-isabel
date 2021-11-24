@@ -10,6 +10,7 @@
           clearable
           dense
           outlined
+          autofocus
           hide-details="auto"
         ></v-text-field>
       </v-col>
@@ -18,10 +19,13 @@
         <span>Tipo de documento</span>
         <v-select
           v-model="tipoDocumento"
-          :items="tipoDocumentoItems"
+          :items="tiposDocumentoLista"
+          item-text="nombre"
+          item-value="idTipoDocumento"
+          no-data-items="Sin opciones"
           outlined
           dense
-          hide-details
+          hide-details="auto"
         ></v-select>
       </v-col>
 
@@ -75,28 +79,44 @@
         ></v-text-field>
       </v-col>
     </v-row>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="primary" @click="submit" depressed>
+        {{ submitBtn }}</v-btn>
+    </v-card-actions>
   </v-form>
 </template>
 
 <script>
+import { getTiposDocumento } from "../../services/tipos/tipoDocumento.service";
+
 export default {
   props: {
-    esEdit: Boolean,
+    esRegistro: Boolean,
+    submitBtn: String,
   },
   data() {
     return {
       valid: true,
       cedula: "",
       nombreCompleto: "",
-      tipoDocumentoItems: [],
-      tipoDocumento: "",
+      tiposDocumentoLista: [],
+      tipoDocumento: 0,
       numeroDocumento: "",
       numeroTelefono: "",
       numeroCelular: "",
       direccion: "",
-      empleado: {},
+      empleado: {
+        'nombreCompleto': '',
+        'tipoDocumento': '',
+        'numeroDocumento': '',
+        'numeroTelefono': '',
+        'numeroCelular': '',
+        'direccion': ''
+      },
       documentoRules: [
-        (v) => !!v || "La cédula es requerida",
+        (v) => !!v || "El número de documento es requerido",
         (v) => (v && v.length <= 10) || "Puede contener máximo 10 caracteres",
       ],
       nombreRules: [
@@ -105,38 +125,52 @@ export default {
       ],
       telefonoRules: [
         (v) => {
-          if(!v) {
-            this.telefonoDetails = false;
-            return "El Teléfono es requerido";
-          } else if(v.length != 7 || !v.match(/^\d{7}$/)) {
-            this.telefonoDetails = false;
+          if(v.length > 7 || !v.match(/^\d*$/)) {
             return "Ingrese un teléfono válido";
           }
 
-          this.telefonoDetails = true;
           return true;
         },
       ],
       celularRules: [
-        (v) => !!v || "El celular es requerido",
-        (v) => (v && v.length == 10 && v.match(/^\d{10}$/)) || "Ingrese un teléfono válido",
+        (v) => {
+          if(!v) {
+            this.celularDetails = false;
+            return "El celular es requerido";
+          } else if(v.length != 10 || !v.match(/^\d{10}$/)) {
+            this.celularDetails = false;
+            return "Ingrese un celular válido";
+          }
+
+          this.celularDetails = true;
+          return true;
+        },
       ],
       direccionRules: [
         (v) => !!v || "La dirección es requerida",
         (v) => (v && v.length <= 200) || "Puede contener máximo 200 caracteres",
       ],
-      btnPrimario: "Registrar",
-      btnSecundario: "Limpiar",
     };
   },
-  created() {
-    if (this.esEdit) {
-      this.empleado = JSON.parse(localStorage.getItem("empleadoEdit"));
+  mounted() {
+    getTiposDocumento()
+      .then(response => this.tiposDocumentoLista = response.data)
+      .catch(err => console.log("Error:", err));
+  },
+  methods: {
+    submit() {
+      if(this.$refs.form.validate()) {
+        //let tipoDocumentoIndex = 
+        this.empleado = {
+          'nombreCompleto': this.nombreCompleto,
+          'tipoDocumento': this.tipoDocumento,
+          'numeroDocumento': this.numeroDocumento,
+          'numeroTelefono': this.numeroTelefono,
+          'numeroCelular': this.numeroCelular,
+          'direccion': this.direccion
+        }
 
-      if (this.empleado) {
-        this.cedula = this.empleado.cedula;
-        this.nombre = this.empleado.nombre;
-        this.btnPrimario = "Editar";
+        this.$emit('submitEmpleado', this.empleado);
       }
     }
   },

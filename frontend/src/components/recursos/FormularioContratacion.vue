@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation class="px-8 pt-3" >
+  <v-form lazy-validation class="px-8 pt-3">
     <v-row dense>
       <v-col cols="12" sm="12" md="12">
         <span>Negocio</span>
@@ -99,14 +99,23 @@
         </v-textarea>
       </v-col>
     </v-row>
+
+    <v-card-actions v-if="esRegistro">
+      <v-spacer></v-spacer>
+      <v-btn color="primary" depressed>
+        {{ continuarBtn }}</v-btn>
+    </v-card-actions>
   </v-form>
 </template>
 
 <script>
 export default {
+  props: {
+    esRegistro: Boolean,
+    continuarBtn: String,
+  },
   data() {
     return {
-      valid: true,
       nombreNegocio: "Minimercado Santa Isabel",
       dialogFechaCon: false,
       fechaContrato: new Date(

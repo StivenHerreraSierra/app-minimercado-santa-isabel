@@ -24,31 +24,13 @@
 
           <v-window v-model="step">
             <v-window-item :value="1">
-              <FormularioContratacion />
+              <FormularioContratacion :esRegistro="esRegistro" :submitBtn="continuarContratoBtn" />
             </v-window-item>
 
             <v-window-item :value="2">
-              <FormularioEmpleado :esEdit="false" />
+              <FormularioEmpleado :esRegistro="esRegistro" :submitBtn="continuarEmpleadoBtn" @submitEmpleado="submitEmpleado" />
             </v-window-item>
           </v-window>
-
-          <v-card-actions class="mt-6">
-            <v-btn
-              color="primary"
-              @click="atrasWindow"
-              depressed
-              :disabled="atrasEnabled"
-              >Regresar</v-btn
-            >
-            <v-spacer></v-spacer>
-            <v-btn
-              color="primary"
-              @click="continuarWindow"
-              depressed
-              :disabled="continuarEnabled"
-              >Continuar</v-btn
-            >
-          </v-card-actions>
         </v-card>
       </v-dialog>
     </v-toolbar>
@@ -65,6 +47,7 @@
 import Tabla from "../../components/Tabla.vue";
 import FormularioContratacion from "../../components/recursos/FormularioContratacion.vue";
 import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
+import { agregarEmpleado } from '../../services/recursos/empleados.service';
 
 export default {
   components: {
@@ -74,6 +57,7 @@ export default {
   },
   data() {
     return {
+      validContrato: true,
       titulo: "Contratos",
       labelBuscador: "Buscar contrato por código",
       dialogRegistro: false,
@@ -96,6 +80,10 @@ export default {
       items: [],
       contratoInput: {},
       empleadoInput: {},
+      regresarBtn: "Regresar",
+      continuarContratoBtn: "continuar",
+      continuarEmpleadoBtn: "Guardar",
+      esRegistro: true,
     };
   },
   methods: {
@@ -107,25 +95,35 @@ export default {
       }
     },
     atrasWindow() {
-      this.step = this.step === 1 ? 2 : this.step - 1;
+      if(this.step === 2) {
+        this.step -= 1;
+      }
     },
     continuarWindow() {
-      this.step = this.step === 2 ? 1 : this.step + 1;
+      if(this.step === 1) {
+        this.step += 1;
+      }
     },
     cerrarDialogoRegistro() {
       this.step = 1;
       this.contrato = {};
       this.empleado = {};
       this.dialogRegistro = false;
+    },
+    submitEmpleado(empleado) {
+      this.empleadoInput = empleado;
+
+      agregarEmpleado(this.empleadoInput)
+        .then(response => console.log(response))
+        .catch(err => console.error(err));
+
+        this.empleadoInput = {};
     }
   },
   computed: {
-    continuarEnabled() {
-      return this.step != 1;
-    },
-    atrasEnabled() {
-      return this.step != 2;
-    },
+    puedeRegresar() {
+      return this.step > 1;
+    }
   },
 };
 </script>

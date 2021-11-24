@@ -12,11 +12,13 @@ module.exports = class Empleado {
     }
 
     static add(req, res) {
-        const sql = "INSERT INTO Empleado SET ?";
+        const sql = "INSERT INTO Empleado (numeroDocumento, TipoDocumento_idTipoDocumento, nombreCompleto, direccion) VALUES ?";
 
         const empleado = {
-            cedula: req.body.cedula,
-            nombre: req.body.nombre
+            numeroDocumento: req.body.numeroDocumento,
+            TipoDocumento_idTipoDocumento: req.body.tipoDocumento,
+            nombreCompleto: req.body.nombreCompleto,
+            direccion: req.body.direccion
         };
 
         connection.query(sql, empleado, error =>{
