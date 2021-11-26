@@ -1,5 +1,5 @@
 <template>
-  <v-form lazy-validation class="px-8 pt-3">
+  <v-form ref="form" v-model="valid" lazy-validation class="px-8 pt-3">
     <v-row dense>
       <v-col cols="12" sm="12" md="12">
         <span>Negocio</span>
@@ -28,10 +28,10 @@
               readonly
               v-bind="attrs"
               v-on="on"
+              :rules="fechaContratacionRules"
               outlined
               dense
               hide-details="auto"
-              required
             ></v-text-field>
           </template>
 
@@ -71,14 +71,15 @@
 
       <v-col cols="12" sm="12" md="12">
         <span>Cargo</span>
-        <v-combobox
+        <v-select
           v-model="cargo"
-          :items="cargoItems"
+          :items="cargosLista"
+          item-text="nombre"
+          item-value="codigo"
           outlined
           dense
           hide-details="auto"
-          required
-        ></v-combobox>
+        ></v-select>
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
@@ -89,7 +90,6 @@
           outlined
           dense
           hide-details="auto"
-          required
         ></v-text-field>
       </v-col>
 
@@ -100,22 +100,24 @@
       </v-col>
     </v-row>
 
-    <v-card-actions v-if="esRegistro">
+    <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" depressed>
-        {{ continuarBtn }}</v-btn>
+      <v-btn color="primary" @click="submit" depressed> {{ submitBtn }}</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
+import { getCargos } from '../../services/recursos/contratos.service';
+
 export default {
   props: {
     esRegistro: Boolean,
-    continuarBtn: String,
+    submitBtn: String,
   },
   data() {
     return {
+      valid: true,
       nombreNegocio: "Minimercado Santa Isabel",
       dialogFechaCon: false,
       fechaContrato: new Date(
@@ -125,12 +127,32 @@ export default {
         .substr(0, 10),
       dialogFechaTer: false,
       fechaTerminacion: "",
-      cargoItems: [],
-      cargo: "",
+      cargosLista: [],
+      cargo: 0,
       salario: "",
       detalles: "",
+      fechaContratacionRules: [(v) => !!v || "Campo requerido"],
+      contrato: {},
     };
   },
+  methods: {
+    submit() {
+      this.contrato = {
+        fechaContratacion: this.fechaContrato,
+        fechaTerminacion: this.fechaTerminacion,
+        cargoId: this.cargo,
+        salario: this.salario,
+        detalles: this.detalles
+      };
+
+      this.$emit('submitContrato', this.contrato);
+    },
+  },
+  mounted() {
+    getCargos()
+      .then(response => this.cargosLista = response.data)
+      .catch(err => console.error(err.message));
+  }
 };
 </script>
 

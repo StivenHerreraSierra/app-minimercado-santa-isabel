@@ -167,7 +167,7 @@ export default {
           'numeroDocumento': this.numeroDocumento,
           'numeroTelefono': this.numeroTelefono,
           'numeroCelular': this.numeroCelular,
-          'direccion': this.direccion
+          'direccionResidencia': this.direccion
         }
 
         this.$emit('submitEmpleado', this.empleado);

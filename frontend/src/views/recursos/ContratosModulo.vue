@@ -24,11 +24,11 @@
 
           <v-window v-model="step">
             <v-window-item :value="1">
-              <FormularioContratacion :esRegistro="esRegistro" :submitBtn="continuarContratoBtn" />
+              <FormularioContratacion :submitBtn="continuarContratoBtn" @submitContrato="submitContrato" />
             </v-window-item>
 
             <v-window-item :value="2">
-              <FormularioEmpleado :esRegistro="esRegistro" :submitBtn="continuarEmpleadoBtn" @submitEmpleado="submitEmpleado" />
+              <FormularioEmpleado :submitBtn="continuarEmpleadoBtn" @submitEmpleado="submitEmpleado" />
             </v-window-item>
           </v-window>
         </v-card>
@@ -48,6 +48,8 @@ import Tabla from "../../components/Tabla.vue";
 import FormularioContratacion from "../../components/recursos/FormularioContratacion.vue";
 import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
 import { agregarEmpleado } from '../../services/recursos/empleados.service';
+import { agregarContrato } from '../../services/recursos/contratos.service';
+import { agregarNumero } from '../../services/recursos/telefonosEmpleado.service';
 
 export default {
   components: {
@@ -80,6 +82,8 @@ export default {
       items: [],
       contratoInput: {},
       empleadoInput: {},
+      telefonoInput: {},
+      celularInput: {},
       regresarBtn: "Regresar",
       continuarContratoBtn: "continuar",
       continuarEmpleadoBtn: "Guardar",
@@ -110,14 +114,60 @@ export default {
       this.empleado = {};
       this.dialogRegistro = false;
     },
+    submitContrato(contrato) {
+      this.contratoInput = contrato;
+
+      this.step += 1;
+    },
     submitEmpleado(empleado) {
+      this.telefonoInput = {
+        'numeroDocumento': empleado.numeroDocumento,
+        'numeroTelefono': empleado.numeroTelefono
+      };
+      this.celularInput = {
+        'numeroDocumento': empleado.numeroDocumento,
+        'numeroCelular': empleado.numeroCelular,
+      };
+
+      delete empleado.numeroTelefono;
+      delete empleado.numeroCelular;
+
       this.empleadoInput = empleado;
 
-      agregarEmpleado(this.empleadoInput)
+      if(this.contratoInput) this.guardarRegistro();
+    },
+    guardarRegistro() {
+      if(this.contratoInput && this.empleadoInput) {
+        
+        this.registrarEmpleado();
+/*
+        this.contratoInput.empleadoNumeroDocumento = this.empleadoInput.numeroDocumento;
+        this.registrarContrato();
+
+        this.registrarNumero(this.celularInput);
+        if(this.telefonoInput && this.telefonoInput.numeroCelular) this.registrarNumero(this.telefonoInput);
+*/        
+      }
+
+    },
+    registrarContrato() {
+      agregarContrato(this.contratoInput)
         .then(response => console.log(response))
         .catch(err => console.error(err));
 
-        this.empleadoInput = {};
+      this.contratoInput = {};
+    },
+    registrarEmpleado() {
+      agregarEmpleado(this.empleadoInput)
+        .then(response => console.log(response.data))
+        .catch(err => console.error("Error: ", err.response.data.message));
+
+      this.empleadoInput = {};
+    },
+    registrarNumero(numero) {
+      agregarNumero(numero)
+        .then(response => console.log(response))
+        .catch(err => console.error(err));
     }
   },
   computed: {

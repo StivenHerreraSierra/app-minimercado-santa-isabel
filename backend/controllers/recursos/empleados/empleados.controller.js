@@ -1,4 +1,5 @@
 const connection = require('../../../config/database');
+const telefonoController = require('./telefonoEmpleado.controller');
 
 module.exports = class Empleado {
     static getAll(req, res) {
@@ -12,16 +13,30 @@ module.exports = class Empleado {
     }
 
     static add(req, res) {
-        const sql = "INSERT INTO Empleado (numeroDocumento, TipoDocumento_idTipoDocumento, nombreCompleto, direccion) VALUES ?";
+        const sql = "INSERT INTO Empleado (numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento) VALUES (?, ?, ?, ?)";
+        let mensajeError = "";
 
-        const empleado = {
-            numeroDocumento: req.body.numeroDocumento,
-            TipoDocumento_idTipoDocumento: req.body.tipoDocumento,
-            nombreCompleto: req.body.nombreCompleto,
-            direccion: req.body.direccion
-        };
+        if(!req.body.numeroDocumento) {
+            mensajeError = "El campo 'Número de documento' no puede ser vacío";
+        } else if(!req.body.nombreCompleto){
+            mensajeError = "El campo 'Nombre completo' no puede ser vacío";
+        } else if(!req.body.direccionResidencia) {
+            mensajeError = "El campo 'Dirección' no puede ser vacío";
+        }
+        if(mensajeError != "") {
+            res.status(400).json({ "message": mensajeError });
+            console.log("Error en empleados:", mensajeError);
+            return;
+        }
 
-        connection.query(sql, empleado, error =>{
+        const empleado = [
+            req.body.numeroDocumento,
+            req.body.nombreCompleto,
+            req.body.direccionResidencia,
+            req.body.tipoDocumento
+        ];
+
+        connection.query(sql, empleado, error => {
             if(error) throw error;
 
             res.status(201).json({ "message": "Empleado creado" });
@@ -49,8 +64,7 @@ module.exports = class Empleado {
                 if(error) throw error;
 
                 if(result.affectedRows == 0) res.status(400).send({ error: 'No se encontró un empleado con esa cédula' });
-
-                res.status(200).json({ "message": "Empleado eliminado" });
+                else res.status(200).json({ "message": "Empleado eliminado" });
             });
         } else {
             res.status(400).send({ error: "La cédula no puede ser vacía" });
