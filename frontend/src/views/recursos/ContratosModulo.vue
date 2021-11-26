@@ -120,17 +120,20 @@ export default {
       this.step += 1;
     },
     submitEmpleado(empleado) {
-      this.telefonoInput = {
-        'numeroDocumento': empleado.numeroDocumento,
-        'numeroTelefono': empleado.numeroTelefono
-      };
       this.celularInput = {
-        'numeroDocumento': empleado.numeroDocumento,
-        'numeroCelular': empleado.numeroCelular,
+        'numero': empleado.numeroCelular,
+        'numeroDocumento': empleado.numeroDocumento
       };
-
-      delete empleado.numeroTelefono;
       delete empleado.numeroCelular;
+
+      if(empleado.numeroTelefono) {
+        this.telefonoInput = {
+          'numero': empleado.numeroTelefono,
+          'numeroDocumento': empleado.numeroDocumento
+        }
+
+        delete empleado.numeroTelefono;
+      }
 
       this.empleadoInput = empleado;
 
@@ -138,22 +141,23 @@ export default {
     },
     guardarRegistro() {
       if(this.contratoInput && this.empleadoInput) {
-        
         this.registrarEmpleado();
+        
+        this.registrarNumero(this.celularInput);
+
+        if(this.telefonoInput.numero) this.registrarNumero(this.telefonoInput);
+
 /*
         this.contratoInput.empleadoNumeroDocumento = this.empleadoInput.numeroDocumento;
         this.registrarContrato();
-
-        this.registrarNumero(this.celularInput);
-        if(this.telefonoInput && this.telefonoInput.numeroCelular) this.registrarNumero(this.telefonoInput);
 */        
       }
 
     },
     registrarContrato() {
       agregarContrato(this.contratoInput)
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+        .then(response => console.log(response.data))
+        .catch(err => console.error(err.response.data.message));
 
       this.contratoInput = {};
     },
@@ -166,8 +170,8 @@ export default {
     },
     registrarNumero(numero) {
       agregarNumero(numero)
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+        .then(response => console.log(response.data))
+        .catch(err => console.error(err.response.data.message));
     }
   },
   computed: {

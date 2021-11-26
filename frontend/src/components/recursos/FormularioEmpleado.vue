@@ -107,14 +107,6 @@ export default {
       numeroTelefono: "",
       numeroCelular: "",
       direccion: "",
-      empleado: {
-        'nombreCompleto': '',
-        'tipoDocumento': '',
-        'numeroDocumento': '',
-        'numeroTelefono': '',
-        'numeroCelular': '',
-        'direccion': ''
-      },
       documentoRules: [
         (v) => !!v || "El número de documento es requerido",
         (v) => (v && v.length <= 10) || "Puede contener máximo 10 caracteres",
@@ -160,17 +152,16 @@ export default {
   methods: {
     submit() {
       if(this.$refs.form.validate()) {
-        //let tipoDocumentoIndex = 
-        this.empleado = {
-          'nombreCompleto': this.nombreCompleto,
+        var empleado = {
+          'nombreCompleto': this.nombreCompleto.trim(),
           'tipoDocumento': this.tipoDocumento,
-          'numeroDocumento': this.numeroDocumento,
-          'numeroTelefono': this.numeroTelefono,
-          'numeroCelular': this.numeroCelular,
-          'direccionResidencia': this.direccion
+          'numeroDocumento': this.numeroDocumento.trim(),
+          'numeroCelular': this.numeroCelular.trim(),
+          'numeroTelefono': this.numeroTelefono.trim(),
+          'direccionResidencia': this.direccion.trim()
         }
 
-        this.$emit('submitEmpleado', this.empleado);
+        this.$emit('submitEmpleado', empleado);
       }
     }
   },
