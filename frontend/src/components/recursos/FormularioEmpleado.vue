@@ -2,7 +2,7 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-8 pt-3">
     <v-row dense>
       <v-col cols="12" sm="12" md="12">
-        <span>Nombre completo</span>
+        <span>Nombre completo *</span>
         <v-text-field
           v-model="nombreCompleto"
           :rules="nombreRules"
@@ -16,7 +16,7 @@
       </v-col>
 
       <v-col cols="12" sm="6" md="6">
-        <span>Tipo de documento</span>
+        <span>Tipo de documento *</span>
         <v-select
           v-model="tipoDocumento"
           :items="tiposDocumentoLista"
@@ -30,7 +30,7 @@
       </v-col>
 
       <v-col cols="12" sm="6" md="6">
-        <span>Número de documento</span>
+        <span>Número de documento *</span>
         <v-text-field
           v-model="numeroDocumento"
           :rules="documentoRules"
@@ -55,7 +55,7 @@
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
-        <span>Número de celular</span>
+        <span>Número de celular *</span>
         <v-text-field
           v-model="numeroCelular"
           :rules="celularRules"
@@ -67,7 +67,7 @@
       </v-col>
 
       <v-col cols="12" sm="12">
-        <span>Dirección</span>
+        <span>Dirección *</span>
         <v-text-field
           v-model="direccion"
           :rules="direccionRules"

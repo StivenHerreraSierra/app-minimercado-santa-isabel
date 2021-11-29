@@ -24,7 +24,7 @@
 
           <v-window v-model="step">
             <v-window-item :value="1">
-              <FormularioContratacion :submitBtn="continuarContratoBtn" @submitContrato="submitContrato" />
+              <FormularioContratacion :limpiarCampos="contratoRegistrado" :submitBtn="continuarContratoBtn" @submitContrato="submitContrato" />
             </v-window-item>
 
             <v-window-item :value="2">
@@ -48,7 +48,7 @@ import Tabla from "../../components/Tabla.vue";
 import FormularioContratacion from "../../components/recursos/FormularioContratacion.vue";
 import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
 import { agregarEmpleado } from '../../services/recursos/empleados.service';
-import { agregarContrato } from '../../services/recursos/contratos.service';
+import { agregarContrato, getContratos } from '../../services/recursos/contratos.service';
 import { agregarNumero } from '../../services/recursos/telefonosEmpleado.service';
 
 export default {
@@ -71,11 +71,11 @@ export default {
           sortable: false,
           value: "codigo",
         },
-        { text: "Empleado", value: "empleado" },
-        { text: "Cargo", value: "cargo" },
+        { text: "Empleado", value: "Empleado_numeroDocumento" },
+        { text: "Cargo", value: "Cargo_codigo" },
         { text: "Salario", value: "salario" },
         { text: "Estado", value: "estado" },
-        { text: "Fecha contrato", value: "fechaContrato" },
+        { text: "Fecha contrato", value: "fechaContratacion" },
         { text: "Fecha terminación", value: "fechaTerminacion" },
         { text: "", value: "actions" },
       ],
@@ -88,6 +88,7 @@ export default {
       continuarContratoBtn: "continuar",
       continuarEmpleadoBtn: "Guardar",
       esRegistro: true,
+      contratoRegistrado: false,
     };
   },
   methods: {
@@ -147,30 +148,38 @@ export default {
 
         if(this.telefonoInput.numero) this.registrarNumero(this.telefonoInput);
 
-/*
         this.contratoInput.empleadoNumeroDocumento = this.empleadoInput.numeroDocumento;
-        this.registrarContrato();
-*/        
-      }
 
+        this.registrarContrato();
+      }
     },
     registrarContrato() {
       agregarContrato(this.contratoInput)
-        .then(response => console.log(response.data))
+        .then(response => {
+          console.log(response.data);
+          this.contratoInput = {};  
+        })
         .catch(err => console.error(err.response.data.message));
-
-      this.contratoInput = {};
     },
     registrarEmpleado() {
       agregarEmpleado(this.empleadoInput)
-        .then(response => console.log(response.data))
+        .then(response => {
+          console.log(response.data);
+          this.empleadoInput = {};
+        })
         .catch(err => console.error("Error: ", err.response.data.message));
-
-      this.empleadoInput = {};
     },
     registrarNumero(numero) {
       agregarNumero(numero)
         .then(response => console.log(response.data))
+        .catch(err => console.error(err.response.data.message));
+    },
+    cargarContratos() {
+      getContratos()
+        .then(response => {
+          this.items = response.data
+          console.log(response.data);
+        })
         .catch(err => console.error(err.response.data.message));
     }
   },
@@ -179,6 +188,9 @@ export default {
       return this.step > 1;
     }
   },
+  mounted() {
+    this.cargarContratos()
+  }
 };
 </script>
 

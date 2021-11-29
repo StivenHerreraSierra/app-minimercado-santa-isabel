@@ -14,11 +14,12 @@
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
-        <span>Fecha contratación</span>
+        <span>Fecha contratación *</span>
         <v-menu
           transition="scale-transition"
           offset-y
           min-width="auto"
+          :close-on-content-click="false"
           v-model="dialogFechaCon"
         >
           <template v-slot:activator="{ on, attrs }">
@@ -37,17 +38,19 @@
 
           <v-date-picker
             v-model="fechaContrato"
+            no-title
             @input="dialogFechaCon = false"
           ></v-date-picker>
         </v-menu>
       </v-col>
       <v-col cols="12" sm="12" md="12">
-        <span>Fecha de terminación</span>
+        <span>Fecha de terminación *</span>
         <v-menu
           transition="scale-transition"
           offset-y
           min-width="auto"
           v-model="dialogFechaTer"
+          :close-on-content-click="false"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
@@ -64,13 +67,14 @@
 
           <v-date-picker
             v-model="fechaTerminacion"
+            no-title
             @input="dialogFechaTer = false"
           ></v-date-picker>
         </v-menu>
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
-        <span>Cargo</span>
+        <span>Cargo *</span>
         <v-select
           v-model="cargo"
           :items="cargosLista"
@@ -83,7 +87,7 @@
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
-        <span>Salario</span>
+        <span>Salario *</span>
         <v-text-field
           v-model="salario"
           prepend-inner-icon="mdi-currency-usd"
@@ -114,6 +118,7 @@ export default {
   props: {
     esRegistro: Boolean,
     submitBtn: String,
+    contratoRegistrado: Boolean
   },
   data() {
     return {
@@ -147,11 +152,30 @@ export default {
 
       this.$emit('submitContrato', this.contrato);
     },
+    limpiarCampos() {
+      this.fechaContrato = new Date(
+        Date.now() - new Date().getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .substr(0, 10);
+      this.fechaTerminacion = "";
+      this.cargo = 0;
+      this.salario = "";
+      this.detalles = "";
+      this.contrato = {};
+    }
   },
   mounted() {
     getCargos()
       .then(response => this.cargosLista = response.data)
       .catch(err => console.error(err.message));
+  },
+  watch: {
+    contratoRegistrado(nuevo) {
+      if(nuevo) {
+        this.limpiarCampos();
+      }
+    }
   }
 };
 </script>
