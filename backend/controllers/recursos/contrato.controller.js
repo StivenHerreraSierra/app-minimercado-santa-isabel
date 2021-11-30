@@ -42,4 +42,14 @@ module.exports = class ContratoController {
             else res.status(200).json(results);
         })
     }
+
+    static eliminarContrato(req, res) {
+        const sql = "DELETE FROM Contrato WHERE codigo=? AND Empleado_numeroDocumento=?";
+        const { contrato, empleado } = req.params;
+
+        connection.query(sql, [contrato, empleado], (err) => {
+            if(err) throw err;
+            else res.json({ message: 'Contrato ' + contrato + " eliminado"});
+        })
+    }
 }

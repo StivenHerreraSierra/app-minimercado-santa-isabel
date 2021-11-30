@@ -38,7 +38,7 @@
     <Tabla
       :columnas="headers"
       :registros="items"
-      v-on:eliminarItem="eliminarRegistro"
+      v-on:eliminarRegistro="eliminarRegistro"
     />
   </v-card>
 </template>
@@ -48,8 +48,9 @@ import Tabla from "../../components/Tabla.vue";
 import FormularioContratacion from "../../components/recursos/FormularioContratacion.vue";
 import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
 import { agregarEmpleado } from '../../services/recursos/empleados.service';
-import { agregarContrato, getContratos } from '../../services/recursos/contratos.service';
+import { agregarContrato, getContratos, eliminarContrato } from '../../services/recursos/contratos.service';
 import { agregarNumero } from '../../services/recursos/telefonosEmpleado.service';
+import Swal from 'sweetalert2';
 
 export default {
   components: {
@@ -94,9 +95,17 @@ export default {
   methods: {
     eliminarRegistro(registro) {
       if (registro) {
-        this.items = this.items.filter(
-          (item) => item.codigo != registro.codigo
-        );
+        console.log(registro);
+
+        eliminarContrato(registro.codigo, registro.Empleado_numeroDocumento)
+          .then(response => {
+            this.mostrarAlerta('success', 'Eliminación de contrato', response.data.message, "");
+
+            this.items = this.items.filter(
+              (item) => item.codigo != registro.codigo
+            );
+          })
+          .catch(err => this.mostrarAlerta('error', 'Eliminación de contrato', err.message, ""));
       }
     },
     atrasWindow() {
@@ -176,11 +185,16 @@ export default {
     },
     cargarContratos() {
       getContratos()
-        .then(response => {
-          this.items = response.data
-          console.log(response.data);
-        })
+        .then(response => this.items = response.data)
         .catch(err => console.error(err.response.data.message));
+    },
+    mostrarAlerta(icon, title, text, footer) {
+      Swal.fire({
+        icon,
+        title,
+        text,
+        footer
+      });
     }
   },
   computed: {

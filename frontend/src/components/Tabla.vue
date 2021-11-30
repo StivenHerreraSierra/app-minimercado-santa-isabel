@@ -1,13 +1,10 @@
 <template>
   <v-data-table :headers="columnas" :items="registros">
-    <template v-slot:top>
-      <v-dialog v-model="dialogDelete" persistent>
-        <DialogoEliminar
-          :item="selectedItem"
-          v-on:confirmar="eliminarItem"
-          v-on:cancelar="cerrarDialogoEliminar"
-        />
-      </v-dialog>
+    <template v-slot:[`item.fechaContratacion`]="{ item }">
+      {{ new Date(item.fechaContratacion).toLocaleDateString() }}
+    </template>
+    <template v-slot:[`item.fechaTerminacion`]="{ item }">
+      {{ new Date(item.fechaTerminacion).toLocaleDateString() }}
     </template>
 
     <template v-slot:[`item.actions`]="{ item }">
@@ -17,12 +14,9 @@
 </template>
 
 <script>
-import DialogoEliminar from "./DialogoEliminar.vue";
+import Swal from 'sweetalert2';
 
 export default {
-  components: {
-    DialogoEliminar,
-  },
   props: {
     columnas: Array,
     registros: Array,
@@ -31,7 +25,6 @@ export default {
     return {
       search: "",
       dialog: false,
-      dialogDelete: false,
       selectedItem: {},
       botonEliminar: {
         color: "primary",
@@ -42,18 +35,17 @@ export default {
   methods: {
     abrirDialogoEliminar(item) {
       this.selectedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    cerrarDialogoEliminar() {
-      this.selectedItem = {};
-      this.dialogDelete = false;
-      console.log("cerrar", this.dialogDelete);
-    },
-    eliminarItem() {
-      if (this.selectedItem) {
-        this.$emit("eliminarItem", this.selectedItem);
-        this.dialogDelete = false;
-      }
+      Swal.fire({
+        title: '¿Desea eliminar el registro?',
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar'
+      }).then(response => {
+        if(response.isConfirmed) {
+          this.$emit('eliminarRegistro', item);
+        }
+      });
     },
   },
 };
