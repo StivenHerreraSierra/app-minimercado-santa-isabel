@@ -90,24 +90,25 @@
 
 <script>
 import { getTiposDocumento } from "../../services/tipos/tipoDocumento.service";
-import { agregarEmpleado } from "../../services/recursos/empleados.service"
+import { agregarEmpleado, getEmpleado } from "../../services/recursos/empleados.service"
 import { agregarNumero } from "../../services/recursos/telefonosEmpleado.service";
 
 export default {
   props: {
     esRegistro: Boolean,
+    empleadoEditar: String
   },
   data() {
     return {
       valid: true,
-      cedula: "",
+      numeroDocumento: "",
       nombreCompleto: "",
       tiposDocumentoLista: [],
       tipoDocumento: 0,
-      numeroDocumento: "",
       numeroTelefono: "",
       numeroCelular: "",
       direccion: "",
+      esEdit: false,
       documentoRules: [
         (v) => !!v || "El número de documento es requerido",
         (v) => (v && v.length <= 10) || "Puede contener máximo 10 caracteres",
@@ -145,6 +146,23 @@ export default {
       ],
     };
   },
+  created() {
+    if(this.empleadoEditar) {
+      getEmpleado(this.empleadoEditar)
+        .then(response => {
+          console.log(response.data[0]);
+          
+          this.numeroDocumento = response.data[0].numeroDocumento;
+          this.nombreCompleto = response.data[0].nombreCompleto;
+          this.tipoDocumento = response.data[0].tipoDocumento;
+          this.numeroTelefono = "";
+          this.numeroCelular = "";
+          this.direccion = response.data[0].direccionResidencia;
+          this.esEdit = true;
+        })
+        .catch((err) => console.log(err.response.data.message));
+    }
+  },
   mounted() {
     getTiposDocumento()
       .then(response => this.tiposDocumentoLista = response.data)
@@ -167,9 +185,9 @@ export default {
               this.registrarNumero(this.numeroDocumento, {numero: this.numeroTelefono.trim()});
             }
 
-            this.limpiarCampos();
+            this.mostrarMensaje('Empleado registrado', '', 'success', 2000);
           })
-          .catch((err) => console.log(err.response.data.message));
+          .catch((err) => this.mostrarMensaje('Error al registrar', err, 'error', 2000));
       }
     },
     registrarNumero(empleado, numero) {
@@ -178,13 +196,24 @@ export default {
         .catch((err) => console.error(err.response.data.message));
     },
     limpiarCampos() {
-      this.cedula = "";
+      this.numeroDocumento = "";
       this.nombreCompleto = "";
       this.tipoDocumento = 0;
       this.numeroDocumento = "";
       this.numeroTelefono = "";
       this.numeroCelular = "";
       this.direccion = "";
+    },
+    mostrarMensaje(title, text, icon, timer) {
+      this.$swal({
+        title,
+        text,
+        icon,
+        toast: true,
+        position: 'top-end',
+        timer,
+        showConfirmButton: false
+      });
     }
   },
 };

@@ -81,7 +81,7 @@ export default {
           console.log("EVENTO 'Ver más' NO DISPONIBLE: ", numeroDocumento);
         },
         editar(numeroDocumento) {
-          console.log("EVENTO 'Editar' NO DISPONIBLE: ", numeroDocumento);
+          this.$emit('editarEmpleado', numeroDocumento);
         },
         eliminar(numeroDocumento) {
           removeEmpleado(numeroDocumento)

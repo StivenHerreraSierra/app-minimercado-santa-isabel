@@ -29,7 +29,7 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioEmpleado/>
+            <FormularioEmpleado :empleadoEditar="empleadoEditar"/>
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -47,6 +47,7 @@
 
         <Grid
           :items="empleados"
+          v-on:editarEmpleado="editarEmpleado"
           @eliminarEmpleadoLista="eliminarEmpleadoLista(numeroDocumento)"
         />
       </v-card>
@@ -71,7 +72,8 @@ export default {
       dialogRegistro: false,
       empleados: [],
       dialog: false,
-      esEdit: false
+      esEdit: false,
+      empleadoEditar: ''
     };
   },
 
@@ -79,15 +81,13 @@ export default {
     buscar(texto) {
       console.log("Buscar empleado:", texto);
     },
-    mostrarFormularioEdicion(empleado) {
-      localStorage.setItem("empleadoEdit", JSON.stringify(empleado));
-
-      this.esEdit = true;
-      this.dialog = true;
-    },
     cerrarDialogoRegistro() {
       this.empleado = {};
       this.dialogRegistro = false;
+    },
+    editarEmpleado(numeroDocumento) {
+      this.empleadoEditar = numeroDocumento;
+      this.dialogRegistro = true;
     },
     eliminarEmpleadoLista(numeroDocumento) {
       this.empleados = this.empleados.filter(

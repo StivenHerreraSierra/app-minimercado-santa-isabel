@@ -12,6 +12,16 @@ module.exports = class Empleado {
         });
     }
 
+    static get(req, res) {
+        const sql = "SELECT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento tipoDocumento FROM Empleado WHERE numeroDocumento = ?";
+
+        connection.query(sql, [req.params.numeroDocumento], (error, result) => {
+            if(error) res.status(400).send({ error: 'No se encontró un empleado con ese número de documento' });
+
+            res.status(200).json(result);
+        });
+    }
+
     static add(req, res) {
         const sql = "INSERT INTO Empleado (numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento) VALUES (?, ?, ?, ?)";
         let mensajeError = "";
@@ -63,11 +73,11 @@ module.exports = class Empleado {
             connection.query(sql, (error, result) => {
                 if(error) throw error;
 
-                if(result.affectedRows == 0) res.status(400).send({ error: 'No se encontró un empleado con esa cédula' });
+                if(result.affectedRows == 0) res.status(400).send({ error: 'No se encontró un empleado con ese número de documento' });
                 else res.status(200).json({ "message": "Empleado eliminado" });
             });
         } else {
-            res.status(400).send({ error: "La cédula no puede ser vacía" });
+            res.status(400).send({ error: "El número de documento no puede estar vacío" });
         }
     }
 }
