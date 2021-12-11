@@ -21,8 +21,8 @@
 export default {
   data: () => ({
     links: [
-      ["mdi-truck", "Compras", "/compras"],
-      ["mdi-currency-usd", "Finanzas", "/finanzas"],
+      ["mdi-truck", "Contratos", "/contratos"],
+      ["mdi-currency-usd", "Empleados", "/empleados"],
       ["mdi-wallet-giftcard", "Recursos", "/recursos"],
       ["mdi-shopping-outline", "Ventas", "/ventas"],
     ],

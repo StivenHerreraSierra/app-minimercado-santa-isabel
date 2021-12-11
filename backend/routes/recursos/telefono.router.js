@@ -4,6 +4,7 @@ const router = express.Router();
 
 const Telefono = require('../../controllers/recursos/empleados/telefonoEmpleado.controller');
 
-router.post('/add', Telefono.addTelefono);
+router.post('/add/:empleado', Telefono.addTelefono);
+router.get('/listar/:empleado', Telefono.getTelefonosEmpleado);
 
 module.exports = router;

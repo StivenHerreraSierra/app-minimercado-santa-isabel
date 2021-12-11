@@ -3,7 +3,7 @@ const telefonoController = require('./telefonoEmpleado.controller');
 
 module.exports = class Empleado {
     static getAll(req, res) {
-        const sql = "SELECT * FROM Empleado";
+        const sql = "SELECT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento FROM Empleado";
 
         connection.query(sql, (error, results) => {
             if(error) throw error;
@@ -46,7 +46,7 @@ module.exports = class Empleado {
     static update(req, res) {
         const cedula = req.params.cedula;
         const { nombre } = req.body;
-        const sql = `UPDATE Empleado SET nombre='${nombre}' WHERE cedula=${cedula}`;
+        const sql = `UPDATE Empleado SET nombre='${nombre}' WHERE numeroDocumento=${cedula}`;
 
         connection.query(sql, error => {
             if(error) throw error;
@@ -56,10 +56,10 @@ module.exports = class Empleado {
     }
 
     static delete(req, res) {
-        const cedula = req.params.cedula.trim();
-        const sql = `DELETE FROM Empleado WHERE cedula=${cedula}`
+        const numeroDocumento = req.params.numeroDocumento.trim();
+        const sql = `DELETE FROM Empleado WHERE numeroDocumento=${numeroDocumento}`
 
-        if(cedula.length > 0) {
+        if(numeroDocumento.length > 0) {
             connection.query(sql, (error, result) => {
                 if(error) throw error;
 

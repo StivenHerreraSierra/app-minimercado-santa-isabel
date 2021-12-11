@@ -2,7 +2,7 @@ const connection = require('../../config/database');
 
 module.exports = class ContratoController {
     static add(req, res) {
-        const sql = "INSERT INTO Contrato (salario, fechaContratacion, fechaTerminacion, detalles, Cargo_codigo, Empleado_numeroDocumento) VALUES (?, ?, ?, ?, ?, ?)";
+        const sql = "INSERT INTO Contrato (salario, fechaContratacion, fechaTerminacion, detalles, Cargo_codigo, Empleado_numeroDocumento, EstadoContrato_idEstadoContrato) VALUES (?, ?, ?, ?, ?, ?)";
 
         if(!req.body.salario || !req.body.fechaContratacion || !req.body.fechaTerminacion
             || !req.body.cargoId || !req.body.empleadoNumeroDocumento) {
@@ -16,7 +16,8 @@ module.exports = class ContratoController {
             req.body.fechaTerminacion,
             req.body.detalles,
             req.body.cargoId,
-            req.body.empleadoNumeroDocumento
+            req.body.empleadoNumeroDocumento,
+            req.body.estadoContrato
         ];
 
         connection.query(sql, contrato, err => {
@@ -36,6 +37,15 @@ module.exports = class ContratoController {
 
     static getContratos(req, res) {
         const sql = "SELECT codigo, Empleado_numeroDocumento, Cargo_codigo, salario, fechaContratacion, fechaTerminacion FROM Contrato";
+
+        connection.query(sql, (err, results) => {
+            if(err) res.status(400).json({ 'message': err.message });
+            else res.status(200).json(results);
+        })
+    }
+
+    static getEstados(req, res) {
+        const sql = "SELECT idEstadoContrato, nombre FROM EstadoContrato";
 
         connection.query(sql, (err, results) => {
             if(err) res.status(400).json({ 'message': err.message });

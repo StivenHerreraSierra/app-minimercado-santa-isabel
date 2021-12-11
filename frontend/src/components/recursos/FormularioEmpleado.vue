@@ -26,6 +26,7 @@
           outlined
           dense
           hide-details="auto"
+          placeholder="Seleccione un tipo"
         ></v-select>
       </v-col>
 
@@ -82,19 +83,19 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" @click="submit" depressed>
-        {{ submitBtn }}</v-btn>
+      <v-btn color="primary" @click="submit" depressed>Guardar</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
 import { getTiposDocumento } from "../../services/tipos/tipoDocumento.service";
+import { agregarEmpleado } from "../../services/recursos/empleados.service"
+import { agregarNumero } from "../../services/recursos/telefonosEmpleado.service";
 
 export default {
   props: {
     esRegistro: Boolean,
-    submitBtn: String,
   },
   data() {
     return {
@@ -156,13 +157,34 @@ export default {
           'nombreCompleto': this.nombreCompleto.trim(),
           'tipoDocumento': this.tipoDocumento,
           'numeroDocumento': this.numeroDocumento.trim(),
-          'numeroCelular': this.numeroCelular.trim(),
-          'numeroTelefono': this.numeroTelefono.trim(),
-          'direccionResidencia': this.direccion.trim()
-        }
+          'direccionResidencia': this.direccion.trim(),
+        };
 
-        this.$emit('submitEmpleado', empleado);
+        agregarEmpleado(empleado)
+          .then(() => {
+            this.registrarNumero(this.numeroDocumento, {numero: this.numeroCelular.trim()});
+            if(this.numeroTelefono.trim()) {
+              this.registrarNumero(this.numeroDocumento, {numero: this.numeroTelefono.trim()});
+            }
+
+            this.limpiarCampos();
+          })
+          .catch((err) => console.log(err.response.data.message));
       }
+    },
+    registrarNumero(empleado, numero) {
+      agregarNumero(empleado, numero)
+        .then((response) => console.log(response.data))
+        .catch((err) => console.error(err.response.data.message));
+    },
+    limpiarCampos() {
+      this.cedula = "";
+      this.nombreCompleto = "";
+      this.tipoDocumento = 0;
+      this.numeroDocumento = "";
+      this.numeroTelefono = "";
+      this.numeroCelular = "";
+      this.direccion = "";
     }
   },
 };

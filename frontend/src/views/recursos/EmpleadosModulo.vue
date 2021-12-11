@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import Grid from "../../components/GridContainer.vue";
+import Grid from "../../components/GridEmpleados.vue";
 import Buscador from "../../components/BuscadorForm.vue";
 import FormularioEmpleado from "../../components/recursos/FormularioEmpleado.vue";
 import {

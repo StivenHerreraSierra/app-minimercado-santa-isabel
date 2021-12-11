@@ -13,7 +13,7 @@
         ></v-text-field>
       </v-col>
 
-      <v-col cols="12" sm="12" md="12">
+      <v-col cols="12" sm="12" md="6">
         <span>Fecha contratación *</span>
         <v-menu
           transition="scale-transition"
@@ -43,7 +43,7 @@
           ></v-date-picker>
         </v-menu>
       </v-col>
-      <v-col cols="12" sm="12" md="12">
+      <v-col cols="12" sm="12" md="6">
         <span>Fecha de terminación *</span>
         <v-menu
           transition="scale-transition"
@@ -74,6 +74,20 @@
       </v-col>
 
       <v-col cols="12" sm="12" md="12">
+        <span>Estado *</span>
+        <v-select
+          v-model="estado"
+          :items="estadosLista"
+          item-text="nombre"
+          item-value="codigo"
+          outlined
+          dense
+          hide-details="auto"
+          placeholder="Seleccione un estado"
+        ></v-select>
+      </v-col>
+
+      <v-col cols="12" sm="12" md="12">
         <span>Cargo *</span>
         <v-select
           v-model="cargo"
@@ -83,6 +97,7 @@
           outlined
           dense
           hide-details="auto"
+          placeholder="Seleccione un cargo"
         ></v-select>
       </v-col>
 
@@ -99,20 +114,20 @@
 
       <v-col cols="12" sm="12" md="12">
         <span>Detalles</span>
-        <v-textarea outlined v-model="detalles" hide-details="auto">
+        <v-textarea outlined v-model="detalles" hide-details="auto" no-resize>
         </v-textarea>
       </v-col>
     </v-row>
 
     <v-card-actions>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn color="primary" @click="submit" depressed> {{ submitBtn }}</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
-import { getCargos } from '../../services/recursos/contratos.service';
+import { getCargos, getEstados } from '../../services/recursos/contratos.service';
 
 export default {
   props: {
@@ -134,6 +149,8 @@ export default {
       fechaTerminacion: "",
       cargosLista: [],
       cargo: 0,
+      estadosLista: [],
+      estado: "",
       salario: "",
       detalles: "",
       fechaContratacionRules: [(v) => !!v || "Campo requerido"],
@@ -145,6 +162,7 @@ export default {
       this.contrato = {
         fechaContratacion: this.fechaContrato,
         fechaTerminacion: this.fechaTerminacion,
+        estadoContrato: this.estadoContrato,
         cargoId: this.cargo,
         salario: this.salario,
         detalles: this.detalles
@@ -168,10 +186,15 @@ export default {
   mounted() {
     getCargos()
       .then(response => this.cargosLista = response.data)
-      .catch(err => console.error(err.message));
+      .catch(err => console.error(err.response.data.message));
+
+    getEstados()
+      .then(response => this.estadosLista = response.data)
+      .catch(err => console.error(err.response.data.message));
   },
   watch: {
     contratoRegistrado(nuevo) {
+      console.log('Limpiando campos:', nuevo);
       if(nuevo) {
         this.limpiarCampos();
       }
