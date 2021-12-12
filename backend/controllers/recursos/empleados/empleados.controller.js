@@ -12,6 +12,23 @@ module.exports = class Empleado {
         });
     }
 
+    static getAllFiltered(req, res) {
+        const sql = "SELECT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento "
+                + "FROM Empleado e "
+                + "JOIN TelefonoEmpleado t "
+                + "ON e.numeroDocumento = t.Empleado_numeroDocumento "
+                + "WHERE e.numeroDocumento LIKE ? OR e.nombreCompleto LIKE ? OR e.direccionResidencia LIKE ? "
+                + "OR t.numero LIKE ?";
+
+        const filtro = req.params.filtro + "%";
+
+        connection.query(sql, [filtro, filtro, filtro, filtro], (error, results) => {
+            if(error) throw error;
+
+            res.status(200).json(results);
+        });
+    }
+
     static get(req, res) {
         const sql = "SELECT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento tipoDocumento FROM Empleado WHERE numeroDocumento = ?";
 

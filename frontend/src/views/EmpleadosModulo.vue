@@ -37,8 +37,9 @@
       <v-card>
         <v-card-title>
           <v-text-field
-            v-model="campoBusqueda"
+            v-model="campoFiltro"
             append-icon="mdi-magnify"
+            @click:append="buscar"
             label="Filtrar registros..."
             single-line
             hide-details
@@ -58,7 +59,7 @@
 <script>
 import Grid from "../components/GridEmpleados.vue";
 import FormularioEmpleado from "../components/recursos/FormularioEmpleado.vue";
-import { getEmpleados } from "../services/recursos/empleados.service";
+import { getEmpleados, getEmpleadosFiltrado } from "../services/recursos/empleados.service";
 
 export default {
   components: {
@@ -67,7 +68,7 @@ export default {
   },
   data() {
     return {
-      campoBusqueda: '',
+      campoFiltro: '',
       titulo: "Empleados",
       dialogRegistro: false,
       empleados: [],
@@ -78,8 +79,10 @@ export default {
   },
 
   methods: {
-    buscar(texto) {
-      console.log("Buscar empleado:", texto);
+    buscar() {
+      getEmpleadosFiltrado(this.campoFiltro)
+        .then((response) => this.empleados = response.data)
+        .catch(err => console.error(err));
     },
     cerrarDialogoRegistro() {
       this.empleado = {};
@@ -97,6 +100,7 @@ export default {
     },
     getEmpleados() {
       this.dialogRegistro = false;
+      this.campoFiltro = "";
       getEmpleados()
         .then((response) => (this.empleados = response.data))
         .catch((error) => console.error(error));
