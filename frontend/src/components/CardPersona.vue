@@ -29,14 +29,11 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn icon :title="buttons.verMas.nombre" @click="verMas(persona.numeroDocumento)">
-        <v-icon :color="buttons.verMas.color">{{ buttons.verMas.icono }}</v-icon>
+      <v-btn :title="buttons.editar.nombre" @click="editar(persona.numeroDocumento)" small :color="buttons.editar.color" fab dark>
+        <v-icon>{{ buttons.editar.icono }}</v-icon>
       </v-btn>
-      <v-btn icon :title="buttons.editar.nombre" @click="editar(persona.numeroDocumento)">
-        <v-icon :color="buttons.editar.color">{{ buttons.editar.icono }}</v-icon>
-      </v-btn>
-      <v-btn icon :title="buttons.eliminar.nombre" @click="eliminar(persona.numeroDocumento)">
-        <v-icon :color="buttons.eliminar.color">{{ buttons.eliminar.icono }}</v-icon>
+      <v-btn :title="buttons.eliminar.nombre" @click="eliminar(persona.numeroDocumento)" small :color="buttons.eliminar.color" fab dark>
+        <v-icon>{{ buttons.eliminar.icono }}</v-icon>
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -54,20 +51,15 @@ export default {
     data() {
       return {
         buttons: {
-          verMas: {
-            nombre: "Ver más",
-            icono: "mdi-magnify-plus-outline",
-            color: "black",
-          },
           editar: {
             nombre: "Editar",
             icono: "mdi-pencil",
-            color: "black",
+            color: "primary",
           },
           eliminar: {
             nombre: "Eliminar",
             icono: "mdi-delete",
-            color: "black",
+            color: "error",
           },
         },
         telefonos: []
