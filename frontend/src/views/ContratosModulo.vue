@@ -36,16 +36,17 @@
       <v-card>
         <v-card-title>
           <v-text-field
-            v-model="campoBusqueda"
+            v-model="campoFiltro"
             append-icon="mdi-magnify"
             label="Filtrar registros..."
             single-line
             hide-details
+            @click:append="buscar"
           ></v-text-field>
         </v-card-title>
         <Tabla
           :columnas="headers"
-          :registros="items"
+          :registros="contratos"
           @contratoEliminado="getContratos"
         />
       </v-card>
@@ -56,7 +57,7 @@
 <script>
 import Tabla from "../components/TablaContratos.vue";
 import FormularioContratacion from "../components/recursos/FormularioContratacion.vue";
-import { getContratos } from "../services/recursos/contratos.service";
+import { getContratos, getContratosFiltro } from "../services/recursos/contratos.service";
 
 export default {
   components: {
@@ -65,7 +66,7 @@ export default {
   },
   data() {
     return {
-      campoBusqueda: '',
+      campoFiltro: '',
       titulo: "Contratos",
       dialogRegistro: false,
       headers: [
@@ -83,17 +84,22 @@ export default {
         { text: "Fecha terminación", value: "fechaTerminacion" },
         { text: "", value: "actions" },
       ],
-      items: [],
+      contratos: [],
     };
   },
   methods: {
+    buscar() {
+      getContratosFiltro(this.campoFiltro)
+        .then((response) => this.contratos = response.data)
+        .catch(err => console.error(err));
+    },
     cerrarDialogoRegistro() {
       this.dialogRegistro = false;
     },
     getContratos() {
       getContratos()
         .then((response) => {
-          this.items = response.data;
+          this.contratos = response.data;
           this.cerrarDialogoRegistro();
         })
         .catch((err) => console.error(err.response.data.message));

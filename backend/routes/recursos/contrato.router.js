@@ -8,6 +8,7 @@ router.post('/add', Contrato.add);
 router.get('/cargos', Contrato.getCargos);
 router.get('/estados', Contrato.getEstados);
 router.get('/listar', Contrato.getContratos);
+router.get('/listar/:filtro', Contrato.getContratosFiltro);
 router.delete('/eliminar/:contrato', Contrato.eliminarContrato);
 
 module.exports = router;

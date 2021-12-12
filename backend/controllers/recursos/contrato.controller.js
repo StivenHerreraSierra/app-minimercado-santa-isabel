@@ -49,6 +49,23 @@ module.exports = class ContratoController {
         })
     }
 
+    static getContratosFiltro(req, res) {
+        const sql = "SELECT ct.codigo, ct.Empleado_numeroDocumento empleado, cg.nombre cargo, ct.salario, ct.fechaContratacion, ct.fechaTerminacion, e.nombre estado "
+                    + "FROM Contrato ct "
+                    + "JOIN Cargo cg "
+                    + "ON ct.Cargo_codigo = cg.codigo "
+                    + "JOIN EstadoContrato e "
+                    + "ON ct.EstadoContrato_idEstadoContrato = e.idEstadoContrato "
+                    + "WHERE ct.codigo LIKE ? OR ct.Empleado_numeroDocumento LIKE ? OR cg.nombre LIKE ? OR ct.salario LIKE ? OR ct.fechaContratacion LIKE ? OR ct.fechaTerminacion LIKE ? OR e.nombre LIKE ?";
+
+        const filtro = req.params.filtro + "%";
+
+        connection.query(sql, [filtro, filtro, filtro, filtro, filtro, filtro, filtro], (err, results) => {
+            if(err) res.status(400).json({ 'message': err.message });
+            else res.status(200).json(results);
+        })
+    }
+
     static getEstados(req, res) {
         const sql = "SELECT idEstadoContrato codigo, nombre FROM EstadoContrato";
 
