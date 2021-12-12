@@ -28,7 +28,7 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioContratacion />
+            <FormularioContratacion @contratoRegistrado="getContratos"/>
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -46,7 +46,7 @@
         <Tabla
           :columnas="headers"
           :registros="items"
-          v-on:eliminarRegistro="eliminarRegistro"
+          @contratoEliminado="getContratos"
         />
       </v-card>
     </v-sheet>
@@ -54,14 +54,9 @@
 </template>
 
 <script>
-import Tabla from "../components/Tabla.vue";
+import Tabla from "../components/TablaContratos.vue";
 import FormularioContratacion from "../components/recursos/FormularioContratacion.vue";
-import {
-  agregarContrato,
-  getContratos,
-  eliminarContrato,
-} from "../services/recursos/contratos.service";
-import Swal from "sweetalert2";
+import { getContratos } from "../services/recursos/contratos.service";
 
 export default {
   components: {
@@ -92,76 +87,20 @@ export default {
     };
   },
   methods: {
-    eliminarRegistro(registro) {
-      if (registro) {
-        eliminarContrato(registro.codigo, registro.Empleado_numeroDocumento)
-          .then((response) => {
-            this.mostrarAlerta(
-              "success",
-              "Eliminación de contrato",
-              response.data.message,
-              ""
-            );
-
-            this.items = this.items.filter(
-              (item) => item.codigo != registro.codigo
-            );
-          })
-          .catch((err) =>
-            this.mostrarAlerta(
-              "error",
-              "Eliminación de contrato",
-              err.message,
-              ""
-            )
-          );
-      }
-    },
     cerrarDialogoRegistro() {
-      this.contrato = {};
       this.dialogRegistro = false;
     },
-    submitContrato(contrato) {
-      this.contratoInput = contrato;
-
-      this.step += 1;
-    },
-    guardarRegistro() {
-      if (this.contratoInput) {
-        this.registrarContrato();
-      }
-    },
-    registrarContrato() {
-      agregarContrato(this.contratoInput)
-        .then((response) => {
-          console.log(response.data);
-          this.contratoInput = {};
-        })
-        .catch((err) => {
-          console.error(err.response.data.message);
-        });
-    },
-    cargarContratos() {
+    getContratos() {
       getContratos()
-        .then((response) => (this.items = response.data))
+        .then((response) => {
+          this.items = response.data;
+          this.cerrarDialogoRegistro();
+        })
         .catch((err) => console.error(err.response.data.message));
-    },
-    mostrarAlerta(icon, title, text, footer) {
-      Swal.fire({
-        icon,
-        title,
-        text,
-        footer,
-      });
-    },
-  },
-  computed: {
-    puedeRegresar() {
-      return this.step > 1;
     },
   },
   mounted() {
-    this.cargarContratos();
+    this.getContratos();
   },
 };
 </script>

@@ -165,10 +165,12 @@ export default {
         detalles: this.detalles
       };
 
-      console.log(contrato);
-
       agregarContrato(contrato)
-        .then(res => this.mostrarMensaje('Contrato registrado', res.data.message, 'success', 2000))
+        .then(res => {
+          this.mostrarMensaje('Contrato registrado', res.data.message, 'success', 2000);
+          this.$emit('contratoRegistrado');
+          this.limpiarCampos();
+        })
         .catch(err => this.mostrarMensaje('Error al registrar', err.message, 'error', 2000));
     },
     mostrarMensaje(title, text, icon, timer) {
