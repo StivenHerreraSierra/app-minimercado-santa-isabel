@@ -31,8 +31,8 @@
 
             <FormularioEmpleado
               :empleadoEditar="empleadoEditar"
-              @empleadoEditado="getEmpleados"
-              @empleadoAgregado="getEmpleados"
+              @empleadoEditado="listarEmpleados"
+              @empleadoAgregado="listarEmpleados"
             />
           </v-card>
         </v-dialog>
@@ -102,7 +102,7 @@ export default {
         (empleado) => empleado.numeroDocumento != numeroDocumento
       );
     },
-    getEmpleados() {
+    listarEmpleados() {
       this.dialogRegistro = false;
       this.campoFiltro = "";
       getEmpleados()
@@ -112,7 +112,7 @@ export default {
   },
 
   mounted() {
-    this.getEmpleados();
+    this.listarEmpleados();
   },
 };
 </script>
