@@ -28,11 +28,7 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioContratacion
-              submitBtn="Guardar"
-              @submitContrato="submitContrato"
-              :contratoRegistrado="contratoRegistrado"
-            />
+            <FormularioContratacion />
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -75,19 +71,17 @@ export default {
   data() {
     return {
       campoBusqueda: '',
-      validContrato: true,
       titulo: "Contratos",
-      labelBuscador: "Buscar contrato por código",
       dialogRegistro: false,
       headers: [
         {
           text: "Código",
-          align: "start",
+          align: "center",
           sortable: false,
           value: "codigo",
         },
-        { text: "Empleado", value: "Empleado_numeroDocumento" },
-        { text: "Cargo", value: "Cargo_codigo" },
+        { text: "Empleado", value: "empleado" },
+        { text: "Cargo", value: "cargo" },
         { text: "Salario", value: "salario" },
         { text: "Estado", value: "estado" },
         { text: "Fecha contrato", value: "fechaContratacion" },
@@ -95,9 +89,6 @@ export default {
         { text: "", value: "actions" },
       ],
       items: [],
-      contratoInput: {},
-      esRegistro: true,
-      contratoRegistrado: false,
     };
   },
   methods: {
@@ -129,14 +120,11 @@ export default {
     cerrarDialogoRegistro() {
       this.contrato = {};
       this.dialogRegistro = false;
-      this.contratoRegistrado = false;
     },
     submitContrato(contrato) {
       this.contratoInput = contrato;
 
       this.step += 1;
-
-      this.contratoRegistrado = true;
     },
     guardarRegistro() {
       if (this.contratoInput) {

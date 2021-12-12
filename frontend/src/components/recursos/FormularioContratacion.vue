@@ -2,15 +2,17 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-8 pt-3">
     <v-row dense>
       <v-col cols="12" sm="12" md="12">
-        <span>Negocio</span>
-        <v-text-field
-          hide-details="auto"
-          :value="nombreNegocio"
-          disabled
+        <span>Empleado *</span>
+        <v-select
+          v-model="empleado"
+          :items="empleadosLista"
+          item-text="nombreCompleto"
+          item-value="numeroDocumento"
           outlined
           dense
-          filled
-        ></v-text-field>
+          hide-details="auto"
+          placeholder="Seleccione un empleado"
+        ></v-select>
       </v-col>
 
       <v-col cols="12" sm="12" md="6">
@@ -29,7 +31,6 @@
               readonly
               v-bind="attrs"
               v-on="on"
-              :rules="fechaContratacionRules"
               outlined
               dense
               hide-details="auto"
@@ -121,24 +122,21 @@
 
     <v-card-actions>
       <v-spacer />
-      <v-btn color="primary" @click="submit" depressed> {{ submitBtn }}</v-btn>
+      <v-btn color="primary" @click="submit" depressed>Guardar</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
-import { getCargos, getEstados } from '../../services/recursos/contratos.service';
+import { getCargos, getEstados, agregarContrato } from '../../services/recursos/contratos.service';
+import { getEmpleados } from "../../services/recursos/empleados.service";
 
 export default {
-  props: {
-    esRegistro: Boolean,
-    submitBtn: String,
-    contratoRegistrado: Boolean
-  },
   data() {
     return {
       valid: true,
-      nombreNegocio: "Minimercado Santa Isabel",
+      empleado: {},
+      empleadosLista: [],
       dialogFechaCon: false,
       fechaContrato: new Date(
         Date.now() - new Date().getTimezoneOffset() * 60000
@@ -153,34 +151,45 @@ export default {
       estado: "",
       salario: "",
       detalles: "",
-      fechaContratacionRules: [(v) => !!v || "Campo requerido"],
-      contrato: {},
     };
   },
   methods: {
     submit() {
-      this.contrato = {
+      const contrato = {
+        empleado: this.empleado,
         fechaContratacion: this.fechaContrato,
         fechaTerminacion: this.fechaTerminacion,
-        estadoContrato: this.estadoContrato,
+        estadoContrato: this.estado,
         cargoId: this.cargo,
         salario: this.salario,
         detalles: this.detalles
       };
 
-      this.$emit('submitContrato', this.contrato);
+      console.log(contrato);
+
+      agregarContrato(contrato)
+        .then(res => this.mostrarMensaje('Contrato registrado', res.data.message, 'success', 2000))
+        .catch(err => this.mostrarMensaje('Error al registrar', err.message, 'error', 2000));
+    },
+    mostrarMensaje(title, text, icon, timer) {
+      this.$swal({
+        title,
+        text,
+        icon,
+        toast: true,
+        position: 'top-end',
+        timer,
+        showConfirmButton: false
+      });
     },
     limpiarCampos() {
+      this.$refs.form.reset();
+
       this.fechaContrato = new Date(
         Date.now() - new Date().getTimezoneOffset() * 60000
       )
         .toISOString()
         .substr(0, 10);
-      this.fechaTerminacion = "";
-      this.cargo = 0;
-      this.salario = "";
-      this.detalles = "";
-      this.contrato = {};
     }
   },
   mounted() {
@@ -191,15 +200,11 @@ export default {
     getEstados()
       .then(response => this.estadosLista = response.data)
       .catch(err => console.error(err.response.data.message));
+
+    getEmpleados()
+      .then((response) => this.empleadosLista = response.data)
+      .catch(err => console.error(err));
   },
-  watch: {
-    contratoRegistrado(nuevo) {
-      console.log('Limpiando campos:', nuevo);
-      if(nuevo) {
-        this.limpiarCampos();
-      }
-    }
-  }
 };
 </script>
 

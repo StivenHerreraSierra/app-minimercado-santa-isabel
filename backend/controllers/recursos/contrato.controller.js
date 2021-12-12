@@ -2,10 +2,10 @@ const connection = require('../../config/database');
 
 module.exports = class ContratoController {
     static add(req, res) {
-        const sql = "INSERT INTO Contrato (salario, fechaContratacion, fechaTerminacion, detalles, Cargo_codigo, Empleado_numeroDocumento, EstadoContrato_idEstadoContrato) VALUES (?, ?, ?, ?, ?, ?)";
+        const sql = "INSERT INTO Contrato (salario, fechaContratacion, fechaTerminacion, detalles, Cargo_codigo, Empleado_numeroDocumento, EstadoContrato_idEstadoContrato) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         if(!req.body.salario || !req.body.fechaContratacion || !req.body.fechaTerminacion
-            || !req.body.cargoId || !req.body.empleadoNumeroDocumento) {
+            || !req.body.cargoId || !req.body.empleado) {
             res.status(400).json({ 'message': 'Hay campos vacíos' });
             return;
         }
@@ -16,7 +16,7 @@ module.exports = class ContratoController {
             req.body.fechaTerminacion,
             req.body.detalles,
             req.body.cargoId,
-            req.body.empleadoNumeroDocumento,
+            req.body.empleado,
             req.body.estadoContrato
         ];
 
@@ -36,7 +36,12 @@ module.exports = class ContratoController {
     }
 
     static getContratos(req, res) {
-        const sql = "SELECT codigo, Empleado_numeroDocumento, Cargo_codigo, salario, fechaContratacion, fechaTerminacion FROM Contrato";
+        const sql = "SELECT ct.codigo, ct.Empleado_numeroDocumento empleado, cg.nombre cargo, ct.salario, ct.fechaContratacion, ct.fechaTerminacion, e.nombre estado "
+                    + "FROM Contrato ct "
+                    + "JOIN Cargo cg "
+                    + "ON ct.Cargo_codigo = cg.codigo "
+                    + "JOIN EstadoContrato e "
+                    + "ON ct.EstadoContrato_idEstadoContrato = e.idEstadoContrato";
 
         connection.query(sql, (err, results) => {
             if(err) res.status(400).json({ 'message': err.message });
@@ -45,7 +50,7 @@ module.exports = class ContratoController {
     }
 
     static getEstados(req, res) {
-        const sql = "SELECT idEstadoContrato, nombre FROM EstadoContrato";
+        const sql = "SELECT idEstadoContrato codigo, nombre FROM EstadoContrato";
 
         connection.query(sql, (err, results) => {
             if(err) res.status(400).json({ 'message': err.message });
