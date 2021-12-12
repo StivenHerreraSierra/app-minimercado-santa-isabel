@@ -54,11 +54,10 @@ module.exports = class Empleado {
     }
 
     static update(req, res) {
-        const cedula = req.params.cedula;
-        const { nombre } = req.body;
-        const sql = `UPDATE Empleado SET nombre='${nombre}' WHERE numeroDocumento=${cedula}`;
+        const sql = `UPDATE Empleado SET nombreCompleto=?, direccionResidencia=? WHERE numeroDocumento=?`;
+        const { nombreCompleto, direccionResidencia, numeroDocumento } = req.body;
 
-        connection.query(sql, error => {
+        connection.query(sql, [nombreCompleto, direccionResidencia, numeroDocumento], error => {
             if(error) throw error;
 
             res.status(201).json({ "message": "Empleado actualizado" });

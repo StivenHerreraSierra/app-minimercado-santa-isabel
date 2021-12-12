@@ -8,7 +8,7 @@ const Empleado = require('../../controllers/recursos/empleados/empleados.control
 router.post("/add", Empleado.add);
 router.get("/all", Empleado.getAll);
 router.get("/obtener/:numeroDocumento", Empleado.get);
-router.put("/update/:numeroDocumento", Empleado.update);
+router.put("/editar", Empleado.update);
 router.delete("/delete/:numeroDocumento", Empleado.delete);
 
 module.exports = router;

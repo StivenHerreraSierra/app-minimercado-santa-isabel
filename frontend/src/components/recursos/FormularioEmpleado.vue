@@ -5,7 +5,6 @@
         <span>Nombre completo *</span>
         <v-text-field
           v-model="nombreCompleto"
-          :rules="nombreRules"
           required
           clearable
           dense
@@ -27,6 +26,7 @@
           dense
           hide-details="auto"
           placeholder="Seleccione un tipo"
+          :disabled="esEdit"
         ></v-select>
       </v-col>
 
@@ -34,12 +34,12 @@
         <span>Número de documento *</span>
         <v-text-field
           v-model="numeroDocumento"
-          :rules="documentoRules"
           required
           clearable
           dense
           outlined
           hide-details="auto"
+          :disabled="esEdit"
         ></v-text-field>
       </v-col>
 
@@ -47,11 +47,11 @@
         <span>Número de teléfono</span>
         <v-text-field
           v-model="numeroTelefono"
-          :rules="telefonoRules"
           clearable
           dense
           outlined
           hide-details="auto"
+          v-if="!esEdit"
         ></v-text-field>
       </v-col>
 
@@ -59,11 +59,11 @@
         <span>Número de celular *</span>
         <v-text-field
           v-model="numeroCelular"
-          :rules="celularRules"
           clearable
           dense
           outlined
           hide-details="auto"
+          v-if="!esEdit"
         ></v-text-field>
       </v-col>
 
@@ -71,7 +71,6 @@
         <span>Dirección *</span>
         <v-text-field
           v-model="direccion"
-          :rules="direccionRules"
           required
           clearable
           dense
@@ -83,15 +82,16 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" @click="submit" depressed>Guardar</v-btn>
+      <v-btn color="primary" @click="submit" v-if="!esEdit" depressed>Guardar</v-btn>
+      <v-btn color="primary" @click="editar" v-else depressed>Editar</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
 import { getTiposDocumento } from "../../services/tipos/tipoDocumento.service";
-import { agregarEmpleado, getEmpleado } from "../../services/recursos/empleados.service"
-import { agregarNumero } from "../../services/recursos/telefonosEmpleado.service";
+import { agregarEmpleado, getEmpleado, editarEmpleado } from "../../services/recursos/empleados.service"
+import { agregarNumero, listarTelefonos } from "../../services/recursos/telefonosEmpleado.service";
 
 export default {
   props: {
@@ -109,68 +109,60 @@ export default {
       numeroCelular: "",
       direccion: "",
       esEdit: false,
-      documentoRules: [
-        (v) => !!v || "El número de documento es requerido",
-        (v) => (v && v.length <= 10) || "Puede contener máximo 10 caracteres",
-      ],
-      nombreRules: [
-        (v) => !!v || "El nombre es requerido",
-        (v) => (v && v.length <= 200) || "Puede contener máximo 200 caracteres",
-      ],
-      telefonoRules: [
-        (v) => {
-          if(v.length > 7 || !v.match(/^\d*$/)) {
-            return "Ingrese un teléfono válido";
-          }
-
-          return true;
-        },
-      ],
-      celularRules: [
-        (v) => {
-          if(!v) {
-            this.celularDetails = false;
-            return "El celular es requerido";
-          } else if(v.length != 10 || !v.match(/^\d{10}$/)) {
-            this.celularDetails = false;
-            return "Ingrese un celular válido";
-          }
-
-          this.celularDetails = true;
-          return true;
-        },
-      ],
-      direccionRules: [
-        (v) => !!v || "La dirección es requerida",
-        (v) => (v && v.length <= 200) || "Puede contener máximo 200 caracteres",
-      ],
     };
   },
-  created() {
-    if(this.empleadoEditar) {
-      getEmpleado(this.empleadoEditar)
-        .then(response => {
-          console.log(response.data[0]);
-          
-          this.numeroDocumento = response.data[0].numeroDocumento;
-          this.nombreCompleto = response.data[0].nombreCompleto;
-          this.tipoDocumento = response.data[0].tipoDocumento;
-          this.numeroTelefono = "";
-          this.numeroCelular = "";
-          this.direccion = response.data[0].direccionResidencia;
-          this.esEdit = true;
-        })
-        .catch((err) => console.log(err.response.data.message));
+  watch: {
+    empleadoEditar() {
+      this.limpiarCampos();
+      this.getEmpleado();
     }
   },
   mounted() {
+    this.getEmpleado();
+
     getTiposDocumento()
       .then(response => this.tiposDocumentoLista = response.data)
       .catch(err => console.log("Error:", err));
+
+      this.$refs.form.resetValidation();
   },
   methods: {
+    getEmpleado() {
+      if(this.empleadoEditar) {
+        getEmpleado(this.empleadoEditar)
+          .then(response => {
+            this.numeroDocumento = response.data[0].numeroDocumento;
+            this.nombreCompleto = response.data[0].nombreCompleto;
+            this.tipoDocumento = response.data[0].tipoDocumento;
+            this.direccion = response.data[0].direccionResidencia;
+
+            this.getTelefonos();
+            this.esEdit = true;
+          })
+          .catch((err) => console.log(err.response.data.message));
+      }
+    },
+    getTelefonos() {
+      if(this.empleadoEditar) {
+        listarTelefonos(this.empleadoEditar)
+          .then(response => {
+            if(response.data.length > 1) {
+              let numeros = response.data.sort((n1, n2) => {
+                return n2.numero.length - n1.numero.length;
+              });
+
+              this.numeroCelular = numeros[0].numero;
+              this.numeroTelefono = numeros[1].numero;
+            } else {
+              this.numeroCelular = response.data[0].numero;
+              this.numeroTelefono = "";
+            }
+          })
+          .catch((err) => console.log(err.message));
+      }
+    },
     submit() {
-      if(this.$refs.form.validate()) {
+      if(this.validarDatos()) {
         var empleado = {
           'nombreCompleto': this.nombreCompleto.trim(),
           'tipoDocumento': this.tipoDocumento,
@@ -186,9 +178,38 @@ export default {
             }
 
             this.mostrarMensaje('Empleado registrado', '', 'success', 2000);
+            this.limpiarCampos();
           })
           .catch((err) => this.mostrarMensaje('Error al registrar', err, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al registrar', 'Faltan campos por llenar', 'error', 2000);
       }
+    },
+    editar() {
+      if(this.validarDatos()) {
+        var empleado = {
+          'nombreCompleto': this.nombreCompleto.trim(),
+          'tipoDocumento': this.tipoDocumento,
+          'numeroDocumento': this.numeroDocumento.trim(),
+          'direccionResidencia': this.direccion.trim(),
+        };
+
+        editarEmpleado(empleado)
+          .then(() => {
+            this.mostrarMensaje('Empleado editado', '', 'success', 2000);
+            this.$emit('empleadoEditado');
+            this.limpiarCampos();
+          })
+          .catch((err) => this.mostrarMensaje('Error al editado', err, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al registrar', 'Faltan campos por llenar', 'error', 2000);
+      }
+    },
+    validarDatos() {
+      return this.nombreCompleto.trim()
+          && this.numeroDocumento.trim()
+          && this.numeroCelular.trim()
+          && this.direccion.trim();
     },
     registrarNumero(empleado, numero) {
       agregarNumero(empleado, numero)
@@ -196,13 +217,8 @@ export default {
         .catch((err) => console.error(err.response.data.message));
     },
     limpiarCampos() {
-      this.numeroDocumento = "";
-      this.nombreCompleto = "";
-      this.tipoDocumento = 0;
-      this.numeroDocumento = "";
-      this.numeroTelefono = "";
-      this.numeroCelular = "";
-      this.direccion = "";
+      this.$refs.form.reset();
+      this.esEdit = false;
     },
     mostrarMensaje(title, text, icon, timer) {
       this.$swal({

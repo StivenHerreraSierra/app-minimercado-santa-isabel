@@ -29,7 +29,7 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioEmpleado :empleadoEditar="empleadoEditar"/>
+            <FormularioEmpleado :empleadoEditar="empleadoEditar" @empleadoEditado="getEmpleados" />
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -48,7 +48,7 @@
         <Grid
           :items="empleados"
           v-on:editarEmpleado="editarEmpleado"
-          @eliminarEmpleadoLista="eliminarEmpleadoLista(numeroDocumento)"
+          @eliminarEmpleadoLista="eliminarEmpleadoLista"
         />
       </v-card>
     </v-sheet>
@@ -84,6 +84,7 @@ export default {
     cerrarDialogoRegistro() {
       this.empleado = {};
       this.dialogRegistro = false;
+      this.empleadoEditar = "";
     },
     editarEmpleado(numeroDocumento) {
       this.empleadoEditar = numeroDocumento;
@@ -93,13 +94,17 @@ export default {
       this.empleados = this.empleados.filter(
         (empleado) => empleado.numeroDocumento != numeroDocumento
       );
+    },
+    getEmpleados() {
+      this.dialogRegistro = false;
+      getEmpleados()
+        .then((response) => (this.empleados = response.data))
+        .catch((error) => console.error(error));
     }
   },
 
   mounted() {
-    getEmpleados()
-      .then((response) => (this.empleados = response.data))
-      .catch((error) => console.error(error));
+    this.getEmpleados();
   },
 };
 </script>

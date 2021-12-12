@@ -24,7 +24,7 @@ module.exports = class TelefonoEmpleado {
     }
 
     static getTelefonosEmpleado(req, res) {
-        const sql = "SELECT Empleado_numeroDocumento empleado, numero FROM TelefonoEmpleado WHERE Empleado_numeroDocumento = ?";
+        const sql = "SELECT numero FROM TelefonoEmpleado WHERE Empleado_numeroDocumento = ?";
 
         connection.query(sql, [req.params.empleado], (err, result) => {
             if(err) res.status(400).json({ 'message': err.message });

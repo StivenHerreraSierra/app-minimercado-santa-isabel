@@ -11,6 +11,8 @@
     <v-card-title>{{ persona.nombreCompleto }}</v-card-title>
 
     <v-card-subtitle>{{ persona.numeroDocumento }}</v-card-subtitle>
+    
+    <v-card-text>{{ persona.direccionResidencia }}</v-card-text>
 
     <v-divider class="mx-4"></v-divider>
 
@@ -85,8 +87,23 @@ export default {
         },
         eliminar(numeroDocumento) {
           removeEmpleado(numeroDocumento)
-            .then(() => this.$emit('eliminarEmpleadoLista', numeroDocumento))
-            .catch((err) => console.error("Error", err.error));
+            .then(() => {
+              this.$emit('eliminarEmpleadoLista', numeroDocumento)
+
+              this.mostrarMensaje('Empleado eliminado', '', 'success', 2000);
+            })
+            .catch((err) => this.mostrarMensaje('Error al eliminar', err, 'error', 2000));
+        },
+        mostrarMensaje(title, text, icon, timer) {
+          this.$swal({
+            title,
+            text,
+            icon,
+            toast: true,
+            position: 'top-end',
+            timer,
+            showConfirmButton: false
+          });
         }
     }
 };
