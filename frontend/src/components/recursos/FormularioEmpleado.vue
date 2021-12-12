@@ -93,7 +93,6 @@ import { agregarNumero, listarTelefonos, editarTelefono } from "../../services/r
 
 export default {
   props: {
-    esRegistro: Boolean,
     empleadoEditar: String
   },
   data() {
@@ -121,8 +120,6 @@ export default {
     getTiposDocumento()
       .then(response => this.tiposDocumentoLista = response.data)
       .catch(err => console.log("Error:", err));
-
-      this.$refs.form.resetValidation();
   },
   methods: {
     getEmpleado() {

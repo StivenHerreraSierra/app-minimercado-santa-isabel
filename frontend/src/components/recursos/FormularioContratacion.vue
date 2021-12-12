@@ -122,27 +122,25 @@
 
     <v-card-actions>
       <v-spacer />
-      <v-btn color="primary" @click="submit" depressed>Guardar</v-btn>
+      <v-btn color="primary" v-if="!esEdit" @click="submit" depressed>Guardar</v-btn>
+      <v-btn color="primary" v-else @click="editar" depressed>Editar</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
-import { getCargos, getEstados, agregarContrato } from '../../services/recursos/contratos.service';
+import { getContrato, getCargos, getEstados, agregarContrato, editarContrato } from '../../services/recursos/contratos.service';
 import { getEmpleados } from "../../services/recursos/empleados.service";
 
 export default {
+  props: ['contratoEditar'],
   data() {
     return {
       valid: true,
       empleado: {},
       empleadosLista: [],
       dialogFechaCon: false,
-      fechaContrato: new Date(
-        Date.now() - new Date().getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .substr(0, 10),
+      fechaContrato: "",
       dialogFechaTer: false,
       fechaTerminacion: "",
       cargosLista: [],
@@ -151,10 +149,18 @@ export default {
       estado: "",
       salario: "",
       detalles: "",
+      esEdit: false
     };
+  },
+  watch: {
+    contratoEditar() {
+      this.limpiarCampos();
+      this.getContrato();
+    }
   },
   methods: {
     submit() {
+      if(this.validarDatos()) {
       const contrato = {
         empleado: this.empleado,
         fechaContratacion: this.fechaContrato,
@@ -172,6 +178,43 @@ export default {
           this.limpiarCampos();
         })
         .catch(err => this.mostrarMensaje('Error al registrar', err.message, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al registrar', 'Faltan campos por llenar', 'error', 2000);
+      }
+    },
+    editar() {
+      if(this.validarDatos()) {
+        const contrato = {
+          empleado: this.empleado,
+          fechaContratacion: this.fechaContrato,
+          fechaTerminacion: this.fechaTerminacion,
+          estadoContrato: this.estado,
+          cargoId: this.cargo,
+          salario: this.salario,
+          detalles: this.detalles,
+          codigo: this.contratoEditar
+        };
+
+        console.log(contrato);
+
+        editarContrato(contrato)
+          .then(res => {
+            this.mostrarMensaje('Contrato editado', res.data.message, 'success', 2000);
+            this.$emit('contratoEditado');
+            this.limpiarCampos();
+          })
+          .catch(err => this.mostrarMensaje('Error al editar', err.message, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al editar', 'Faltan campos por llenar', 'error', 2000);
+      }
+    },
+    validarDatos() {
+      return this.empleado
+        && this.fechaContrato
+        && this.fechaTerminacion
+        && this.estado
+        && this.cargo
+        && this.salario;
     },
     mostrarMensaje(title, text, icon, timer) {
       this.$swal({
@@ -186,12 +229,23 @@ export default {
     },
     limpiarCampos() {
       this.$refs.form.reset();
+    },
+    getContrato() {
+      if(this.contratoEditar) {
+        getContrato(this.contratoEditar)
+          .then(response => {
+            this.empleado = response.data[0].empleado;
+            this.fechaContrato = new Date(response.data[0].fechaContratacion).toISOString().slice(0, 10);
+            this.fechaTerminacion = new Date(response.data[0].fechaTerminacion).toISOString().slice(0, 10);
+            this.estado = response.data[0].estado;
+            this.cargo = response.data[0].codigoCargo;
+            this.salario = response.data[0].salario;
+            this.detalles = response.data[0].detalles;
 
-      this.fechaContrato = new Date(
-        Date.now() - new Date().getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .substr(0, 10);
+            this.esEdit = true;
+          })
+          .catch((err) => console.log(err.message));
+      }
     }
   },
   mounted() {
@@ -206,6 +260,8 @@ export default {
     getEmpleados()
       .then((response) => this.empleadosLista = response.data)
       .catch(err => console.error(err));
+
+    this.getContrato()
   },
 };
 </script>

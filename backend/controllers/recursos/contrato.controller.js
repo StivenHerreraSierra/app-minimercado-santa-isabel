@@ -35,6 +35,17 @@ module.exports = class ContratoController {
         })
     }
 
+    static getContrato(req, res) {
+        const sql = "SELECT codigo, Empleado_numeroDocumento empleado, Cargo_codigo codigoCargo, salario, fechaContratacion, fechaTerminacion, EstadoContrato_idEstadoContrato estado, detalles "
+                    + "FROM Contrato "
+                    + "WHERE codigo=?";
+
+        connection.query(sql, [req.params.codigo], (err, result) => {
+            if(err) res.status(400).json({ 'message': err.message });
+            else res.status(200).json(result);
+        })
+    }
+
     static getContratos(req, res) {
         const sql = "SELECT ct.codigo, ct.Empleado_numeroDocumento empleado, cg.nombre cargo, ct.salario, ct.fechaContratacion, ct.fechaTerminacion, e.nombre estado "
                     + "FROM Contrato ct "
@@ -50,7 +61,7 @@ module.exports = class ContratoController {
     }
 
     static getContratosFiltro(req, res) {
-        const sql = "SELECT ct.codigo, ct.Empleado_numeroDocumento empleado, cg.nombre cargo, ct.salario, ct.fechaContratacion, ct.fechaTerminacion, e.nombre estado "
+        const sql = "SELECT DISTINCT ct.codigo, ct.Empleado_numeroDocumento empleado, cg.nombre cargo, ct.salario, ct.fechaContratacion, ct.fechaTerminacion, e.nombre estado "
                     + "FROM Contrato ct "
                     + "JOIN Cargo cg "
                     + "ON ct.Cargo_codigo = cg.codigo "
@@ -82,6 +93,28 @@ module.exports = class ContratoController {
         connection.query(sql, [contrato], (err) => {
             if(err) res.status(400).json({ "message": err.message });
             else res.status(200).json({ message: 'Contrato ' + contrato + " eliminado"});
+        })
+    }
+
+    static editar(req, res) {
+        const sql = "UPDATE Contrato "
+                    + "SET salario=?, fechaContratacion=?, fechaTerminacion=?, detalles=?, Cargo_codigo=?, Empleado_numeroDocumento=?, EstadoContrato_idEstadoContrato=? "
+                    + "WHERE codigo=?";
+
+        const {
+          salario,
+          fechaContratacion,
+          fechaTerminacion,
+          detalles,
+          cargoId,
+          empleado,
+          estadoContrato,
+          codigo
+        } = req.body;
+
+        connection.query(sql, [salario, fechaContratacion,  fechaTerminacion, detalles, cargoId, empleado, estadoContrato, codigo], (err, result) => {
+            if(err) res.status(400).json({ "message": err.message });
+            else res.status(200).json({ message: result.affectedRows + " contrato(s) editado(s)."});
         })
     }
 }

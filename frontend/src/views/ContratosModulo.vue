@@ -28,7 +28,11 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioContratacion @contratoRegistrado="getContratos"/>
+            <FormularioContratacion
+              @contratoRegistrado="getContratos"
+              :contratoEditar="contratoEditar"
+              @contratoEditado="getContratos"  
+            />
           </v-card>
         </v-dialog>
       </v-toolbar>
@@ -48,6 +52,7 @@
           :columnas="headers"
           :registros="contratos"
           @contratoEliminado="getContratos"
+          @editarContrato="editarContrato"
         />
       </v-card>
     </v-sheet>
@@ -85,6 +90,7 @@ export default {
         { text: "", value: "actions" },
       ],
       contratos: [],
+      contratoEditar: ''
     };
   },
   methods: {
@@ -95,6 +101,7 @@ export default {
     },
     cerrarDialogoRegistro() {
       this.dialogRegistro = false;
+      this.contratoEditar = "";
     },
     getContratos() {
       getContratos()
@@ -104,6 +111,10 @@ export default {
         })
         .catch((err) => console.error(err.response.data.message));
     },
+    editarContrato(codigoContrato) {
+      this.contratoEditar = codigoContrato;
+      this.dialogRegistro = true;
+    }
   },
   mounted() {
     this.getContratos();

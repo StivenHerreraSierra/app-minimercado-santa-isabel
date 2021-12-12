@@ -8,7 +8,7 @@
     </template>
 
     <template v-slot:[`item.actions`]="{ item }">
-      <v-btn fab x-small color="primary" class="mr-2" @click="abrirDialogoEditar(item)">
+      <v-btn fab x-small color="primary" class="mr-2" @click="editarContrato(item.codigo)">
         <v-icon> mdi-pencil </v-icon>
       </v-btn>
       <v-btn fab x-small color="error"  @click="abrirDialogoEliminar(item)">
@@ -49,8 +49,8 @@ export default {
         }
       });
     },
-    abrirDialogoEditar(item) {
-      console.log("editar", item);
+    editarContrato(contrato) {
+      this.$emit('editarContrato', contrato);
     },
     mostrarMensaje(title, text, icon, timer) {
       this.$swal({
