@@ -172,12 +172,13 @@ export default {
 
         agregarEmpleado(empleado)
           .then(() => {
-            this.registrarNumero(this.numeroDocumento, {numero: this.numeroCelular.trim()});
+            this.registrarNumero(this.numeroDocumento, {numero: this.numeroCelular.trim(), tipo: "MOVIL"});
             if(this.numeroTelefono.trim()) {
-              this.registrarNumero(this.numeroDocumento, {numero: this.numeroTelefono.trim()});
+              this.registrarNumero(this.numeroDocumento, {numero: this.numeroTelefono.trim(), tipo: "TELEFONO_FIJO"});
             }
 
             this.mostrarMensaje('Empleado registrado', '', 'success', 2000);
+            this.$emit('empleadoAgregado');
             this.limpiarCampos();
           })
           .catch((err) => this.mostrarMensaje('Error al registrar', err, 'error', 2000));

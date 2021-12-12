@@ -29,7 +29,11 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioEmpleado :empleadoEditar="empleadoEditar" @empleadoEditado="getEmpleados" />
+            <FormularioEmpleado
+              :empleadoEditar="empleadoEditar"
+              @empleadoEditado="getEmpleados"
+              @empleadoAgregado="getEmpleados"
+            />
           </v-card>
         </v-dialog>
       </v-toolbar>
