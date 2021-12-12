@@ -15,6 +15,7 @@ app.use('/api/tipos/documento', require('./routes/tipos/tiposDocumento.router'))
 app.use('/api/telefono/empleado', require('./routes/recursos/telefono.router'));
 app.use('/api/contratos', require('./routes/recursos/contrato.router'));
 app.use('/api/reportes', require('./routes/reportes.router'));
+app.use('/api/clientes', require('./routes/recursos/cliente.router'));
 
 //MySQL
 const connection = require('./config/database');

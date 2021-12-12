@@ -23,8 +23,8 @@ export default {
     links: [
       ["mdi-file-document-outline", "Contratos", "/contratos"],
       ["mdi-account-multiple-outline", "Empleados", "/empleados"],
+      ["mdi-cart-outline", "Clientes", "/clientes"],
       ["mdi-chart-pie", "Reportes", "/reportes"],
-      ["mdi-shopping-outline", "Ventas", "/ventas"],
     ],
   }),
 };

@@ -19,7 +19,7 @@
           <v-card>
             <v-toolbar dense flat class="pa-3 mb-2">
               <v-toolbar-title class="text-h5">
-                Registro de empleado
+                Registro de cliente
               </v-toolbar-title>
 
               <v-spacer></v-spacer>
@@ -29,10 +29,10 @@
               </v-btn>
             </v-toolbar>
 
-            <FormularioEmpleado
-              :empleadoEditar="empleadoEditar"
-              @empleadoEditado="listarEmpleados"
-              @empleadoAgregado="listarEmpleados"
+            <FormularioCliente
+              :clienteEditar="clienteEditar"
+              @clienteEditado="listarClientes"
+              @clienteAgregado="listarClientes"
             />
           </v-card>
         </v-dialog>
@@ -51,9 +51,9 @@
         </v-card-title>
 
         <Grid
-          :items="empleados"
-          v-on:editarEmpleado="editarEmpleado"
-          @eliminarEmpleadoLista="eliminarEmpleadoLista"
+          :items="clientes"
+          v-on:editarCliente="editarCliente"
+          @eliminarClienteLista="eliminarClienteLista"
         />
       </v-card>
     </v-sheet>
@@ -61,58 +61,58 @@
 </template>
 
 <script>
-import Grid from "../components/GridEmpleados.vue";
-import FormularioEmpleado from "../components/recursos/FormularioEmpleado.vue";
-import { getEmpleados, getEmpleadosFiltrado } from "../services/recursos/empleados.service";
+import Grid from "../components/GridClientes.vue";
+import FormularioCliente from "../components/recursos/FormularioCliente.vue";
+
+import { getClientes, getClientesFiltrado } from "../services/recursos/clientes.service";
 
 export default {
   components: {
     Grid,
-    FormularioEmpleado,
+    FormularioCliente,
   },
   data() {
     return {
       campoFiltro: '',
-      titulo: "Empleados",
+      titulo: "Clientes",
       dialogRegistro: false,
-      empleados: [],
+      clientes: [],
       dialog: false,
       esEdit: false,
-      empleadoEditar: ''
+      clienteEditar: ''
     };
   },
 
   methods: {
     buscar() {
-      getEmpleadosFiltrado(this.campoFiltro)
-        .then((response) => this.empleados = response.data)
+      getClientesFiltrado(this.campoFiltro)
+        .then((response) => this.clientes = response.data)
         .catch(err => console.error(err));
     },
     cerrarDialogoRegistro() {
-      this.empleado = {};
       this.dialogRegistro = false;
-      this.empleadoEditar = "";
+      this.clienteEditar = "";
     },
-    editarEmpleado(numeroDocumento) {
-      this.empleadoEditar = numeroDocumento;
+    editarCliente(numeroDocumento) {
+      this.clienteEditar = numeroDocumento;
       this.dialogRegistro = true;
     },
-    eliminarEmpleadoLista(numeroDocumento) {
-      this.empleados = this.empleados.filter(
-        (empleado) => empleado.numeroDocumento != numeroDocumento
+    eliminarClienteLista(numeroDocumento) {
+      this.clientes = this.clientes.filter(
+        (cliente) => cliente.numeroDocumento != numeroDocumento
       );
     },
-    listarEmpleados() {
+    listarClientes() {
       this.dialogRegistro = false;
       this.campoFiltro = "";
-      getEmpleados()
-        .then((response) => (this.empleados = response.data))
+      getClientes()
+        .then((response) => (this.clientes = response.data))
         .catch((error) => console.error(error));
     }
   },
 
   mounted() {
-    this.listarEmpleados();
+    this.listarClientes();
   },
 };
 </script>
