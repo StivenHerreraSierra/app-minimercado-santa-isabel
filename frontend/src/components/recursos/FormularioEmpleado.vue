@@ -51,7 +51,6 @@
           dense
           outlined
           hide-details="auto"
-          v-if="!esEdit"
         ></v-text-field>
       </v-col>
 
@@ -63,7 +62,6 @@
           dense
           outlined
           hide-details="auto"
-          v-if="!esEdit"
         ></v-text-field>
       </v-col>
 
@@ -91,7 +89,7 @@
 <script>
 import { getTiposDocumento } from "../../services/tipos/tipoDocumento.service";
 import { agregarEmpleado, getEmpleado, editarEmpleado } from "../../services/recursos/empleados.service"
-import { agregarNumero, listarTelefonos } from "../../services/recursos/telefonosEmpleado.service";
+import { agregarNumero, listarTelefonos, editarTelefono } from "../../services/recursos/telefonosEmpleado.service";
 
 export default {
   props: {
@@ -197,6 +195,7 @@ export default {
 
         editarEmpleado(empleado)
           .then(() => {
+            this.editarTelefonos();
             this.mostrarMensaje('Empleado editado', '', 'success', 2000);
             this.$emit('empleadoEditado');
             this.limpiarCampos();
@@ -211,6 +210,27 @@ export default {
           && this.numeroDocumento.trim()
           && this.numeroCelular.trim()
           && this.direccion.trim();
+    },
+    editarTelefonos() {
+      const movil = {
+        empleado: this.numeroDocumento,
+        numero: this.numeroCelular,
+        tipo: "MOVIL"
+      }
+
+      editarTelefono(movil)
+        .then(res => console.log(res.data.message))
+        .catch((err) => console.error(err));
+      
+      const fijo = {
+        empleado: this.numeroDocumento,
+        numero: this.numeroTelefono,
+        tipo: "TELEFONO_FIJO"
+      }
+
+      editarTelefono(fijo)
+        .then(res => console.log(res.data.message))
+        .catch((err) => console.error(err));
     },
     registrarNumero(empleado, numero) {
       agregarNumero(empleado, numero)
