@@ -10,7 +10,10 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api', require('./routes/routes'));
+app.use('/api/empleados', require('./routes/recursos/empleados.router'));
+app.use('/api/tipos/documento', require('./routes/tipos/tiposDocumento.router'));
+app.use('/api/telefono/empleado', require('./routes/recursos/telefono.router'));
+app.use('/api/contratos', require('./routes/recursos/contrato.router'));
 
 //MySQL
 const connection = require('./config/database');

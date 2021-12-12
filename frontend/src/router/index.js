@@ -11,19 +11,14 @@ const routes = [
     component: Home
   },
   {
-    path: '/compras',
-    name: 'Compras',
-    component: () => import('../views/compras/Compras.vue')
+    path: '/contratos',
+    name: 'Contratos',
+    component: () => import('../views/ContratosModulo.vue')
   },
   {
-    path: '/finanzas',
-    name: 'Finanzas',
-    component: () => import('../views/finanzas/Finanzas.vue')
-  },
-  {
-    path: '/recursos',
-    name: 'Recursos',
-    component: () => import('../views/recursos/Recursos.vue')
+    path: '/empleados',
+    name: 'Empleados',
+    component: () => import('../views/EmpleadosModulo.vue')
   },
   {
     path: '/ventas',

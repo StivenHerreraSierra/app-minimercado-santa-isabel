@@ -19,12 +19,6 @@
           {{ titulo }}
         </span>
       </v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn text color="white">
-        {{ logout }}
-      </v-btn>
     </v-app-bar>
 
     <v-main>
