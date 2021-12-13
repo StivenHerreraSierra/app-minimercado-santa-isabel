@@ -62,13 +62,12 @@
         ></v-text-field>
       </v-col>
 
-      <v-col cols="12" sm="12" md="12" v-if="!esEdit">
+      <v-col cols="12" sm="12" md="12">
         <span>Productos comprados *</span>
         <v-card min-width="100%" max-height="250" style="overflow: auto">
           <v-list shaped>
             <v-list-item-group
               v-model="productosComprados"
-              :disabled="esEdit"
               multiple
             >
               <template v-for="producto in productos">
@@ -89,8 +88,9 @@
 
                     <v-list-item-action>
                       <v-checkbox
-                        :input-value="active"
+                        :input-value="productosComprados.includes(producto)"
                         color="deep-purple accent-4"
+                        :value="active"
                       ></v-checkbox>
                     </v-list-item-action>
                   </template>
@@ -125,7 +125,7 @@ import {
   getClientes,
   getCliente,
 } from "../../services/recursos/clientes.service";
-import { getProductos, agregarProductoVenta } from "../../services/recursos/productos.service";
+import { getProductos, agregarProductoVenta, getProductosComprados } from "../../services/recursos/productos.service";
 
 export default {
   props: ["ventaEditar"],
@@ -192,7 +192,6 @@ export default {
       }
     },
     agregarProductos(codigoVenta) {
-        console.log(codigoVenta);
         for(let producto of this.productosComprados) {
             agregarProductoVenta({
                 "codigoVenta": codigoVenta,
@@ -217,6 +216,8 @@ export default {
 
         editarVenta(venta)
           .then((res) => {
+            this.agregarProductos(this.ventaEditar);
+
             this.mostrarMensaje(
               "Venta editada",
               res.data.message,
@@ -284,6 +285,13 @@ export default {
         .then((response) => (this.cliente = response.data[0]))
         .catch((err) => console.error(err.message));
     },
+    getProductosComprados() {
+        if(this.ventaEditar) {
+            getProductosComprados(this.ventaEditar)
+                .then(res => this.productosComprados = res.data)
+                .catch(err => console.log(err.message));
+        }
+    }
   },
   mounted() {
     getEmpleados()
