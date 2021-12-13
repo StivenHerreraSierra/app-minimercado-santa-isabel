@@ -17,6 +17,7 @@ app.use('/api/contratos', require('./routes/recursos/contrato.router'));
 app.use('/api/ventas', require('./routes/recursos/venta.router'));
 app.use('/api/reportes', require('./routes/reportes.router'));
 app.use('/api/clientes', require('./routes/recursos/cliente.router'));
+app.use('/api/productos', require('./routes/recursos/productos.router'));
 
 //MySQL
 const connection = require('./config/database');

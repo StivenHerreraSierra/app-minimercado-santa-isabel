@@ -13,9 +13,9 @@ module.exports = class VentaController {
             fechaVenta, totalImpuestos, totalDescuentos, empleado, cliente
         } = req.body;
 
-        connection.query(sql, [fechaVenta, totalImpuestos, totalDescuentos, empleado, cliente], err => {
+        connection.query(sql, [fechaVenta, totalImpuestos, totalDescuentos, empleado, cliente], (err, result) => {
             if(err) res.status(400).json({ 'message': err.message });
-            else res.status(201).json({ 'message': 'Factura de venta creada' });
+            else res.status(201).json({ 'message': 'Factura de venta creada', result });
         })
     }
 
