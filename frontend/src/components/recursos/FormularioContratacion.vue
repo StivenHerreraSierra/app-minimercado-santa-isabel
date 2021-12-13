@@ -195,8 +195,6 @@ export default {
           codigo: this.contratoEditar
         };
 
-        console.log(contrato);
-
         editarContrato(contrato)
           .then(res => {
             this.mostrarMensaje('Contrato editado', res.data.message, 'success', 2000);
@@ -229,6 +227,7 @@ export default {
     },
     limpiarCampos() {
       this.$refs.form.reset();
+      this.esEdit = false;
     },
     getContrato() {
       if(this.contratoEditar) {

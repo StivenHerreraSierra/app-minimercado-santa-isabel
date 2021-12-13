@@ -24,6 +24,7 @@ export default {
       ["mdi-file-document-outline", "Contratos", "/contratos"],
       ["mdi-account-multiple-outline", "Empleados", "/empleados"],
       ["mdi-cart-outline", "Clientes", "/clientes"],
+      ["mdi-basket-outline", "Ventas", "/ventas"],
       ["mdi-chart-pie", "Reportes", "/reportes"],
     ],
   }),
