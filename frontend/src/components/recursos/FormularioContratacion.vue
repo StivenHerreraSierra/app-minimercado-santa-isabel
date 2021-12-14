@@ -2,15 +2,17 @@
   <v-form ref="form" v-model="valid" lazy-validation class="px-8 pt-3">
     <v-row dense>
       <v-col cols="12" sm="12" md="12">
-        <span>Negocio</span>
-        <v-text-field
-          hide-details="auto"
-          :value="nombreNegocio"
-          disabled
+        <span>Empleado *</span>
+        <v-select
+          v-model="empleado"
+          :items="empleadosLista"
+          item-text="nombreCompleto"
+          item-value="numeroDocumento"
           outlined
           dense
-          filled
-        ></v-text-field>
+          hide-details="auto"
+          placeholder="Seleccione un empleado"
+        ></v-select>
       </v-col>
 
       <v-col cols="12" sm="12" md="6">
@@ -29,7 +31,6 @@
               readonly
               v-bind="attrs"
               v-on="on"
-              :rules="fechaContratacionRules"
               outlined
               dense
               hide-details="auto"
@@ -121,30 +122,25 @@
 
     <v-card-actions>
       <v-spacer />
-      <v-btn color="primary" @click="submit" depressed> {{ submitBtn }}</v-btn>
+      <v-btn color="primary" v-if="!esEdit" @click="submit" depressed>Guardar</v-btn>
+      <v-btn color="primary" v-else @click="editar" depressed>Editar</v-btn>
     </v-card-actions>
   </v-form>
 </template>
 
 <script>
-import { getCargos, getEstados } from '../../services/recursos/contratos.service';
+import { getContrato, getCargos, getEstados, agregarContrato, editarContrato } from '../../services/recursos/contratos.service';
+import { getEmpleados } from "../../services/recursos/empleados.service";
 
 export default {
-  props: {
-    esRegistro: Boolean,
-    submitBtn: String,
-    contratoRegistrado: Boolean
-  },
+  props: ['contratoEditar'],
   data() {
     return {
       valid: true,
-      nombreNegocio: "Minimercado Santa Isabel",
+      empleado: {},
+      empleadosLista: [],
       dialogFechaCon: false,
-      fechaContrato: new Date(
-        Date.now() - new Date().getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .substr(0, 10),
+      fechaContrato: "",
       dialogFechaTer: false,
       fechaTerminacion: "",
       cargosLista: [],
@@ -153,34 +149,102 @@ export default {
       estado: "",
       salario: "",
       detalles: "",
-      fechaContratacionRules: [(v) => !!v || "Campo requerido"],
-      contrato: {},
+      esEdit: false
     };
+  },
+  watch: {
+    contratoEditar() {
+      this.limpiarCampos();
+      this.getContrato();
+    }
   },
   methods: {
     submit() {
-      this.contrato = {
+      if(this.validarDatos()) {
+      const contrato = {
+        empleado: this.empleado,
         fechaContratacion: this.fechaContrato,
         fechaTerminacion: this.fechaTerminacion,
-        estadoContrato: this.estadoContrato,
+        estadoContrato: this.estado,
         cargoId: this.cargo,
         salario: this.salario,
         detalles: this.detalles
       };
 
-      this.$emit('submitContrato', this.contrato);
+      agregarContrato(contrato)
+        .then(res => {
+          this.mostrarMensaje('Contrato registrado', res.data.message, 'success', 2000);
+          this.$emit('contratoRegistrado');
+          this.limpiarCampos();
+        })
+        .catch(err => this.mostrarMensaje('Error al registrar', err.message, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al registrar', 'Faltan campos por llenar', 'error', 2000);
+      }
+    },
+    editar() {
+      if(this.validarDatos()) {
+        const contrato = {
+          empleado: this.empleado,
+          fechaContratacion: this.fechaContrato,
+          fechaTerminacion: this.fechaTerminacion,
+          estadoContrato: this.estado,
+          cargoId: this.cargo,
+          salario: this.salario,
+          detalles: this.detalles,
+          codigo: this.contratoEditar
+        };
+
+        editarContrato(contrato)
+          .then(res => {
+            this.mostrarMensaje('Contrato editado', res.data.message, 'success', 2000);
+            this.$emit('contratoEditado');
+            this.limpiarCampos();
+          })
+          .catch(err => this.mostrarMensaje('Error al editar', err.message, 'error', 2000));
+      } else {
+        this.mostrarMensaje('Error al editar', 'Faltan campos por llenar', 'error', 2000);
+      }
+    },
+    validarDatos() {
+      return this.empleado
+        && this.fechaContrato
+        && this.fechaTerminacion
+        && this.estado
+        && this.cargo
+        && this.salario;
+    },
+    mostrarMensaje(title, text, icon, timer) {
+      this.$swal({
+        title,
+        text,
+        icon,
+        toast: true,
+        position: 'top-end',
+        timer,
+        showConfirmButton: false
+      });
     },
     limpiarCampos() {
-      this.fechaContrato = new Date(
-        Date.now() - new Date().getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .substr(0, 10);
-      this.fechaTerminacion = "";
-      this.cargo = 0;
-      this.salario = "";
-      this.detalles = "";
-      this.contrato = {};
+      this.$refs.form.reset();
+      this.esEdit = false;
+    },
+    getContrato() {
+      if(this.contratoEditar) {
+        getContrato(this.contratoEditar)
+          .then(response => {
+            this.empleado = response.data[0].empleado;
+            this.fechaContrato = new Date(response.data[0].fechaContratacion).toISOString().slice(0, 10);
+            this.fechaTerminacion = new Date(response.data[0].fechaTerminacion).toISOString().slice(0, 10);
+            this.estado = response.data[0].estado;
+            this.cargo = response.data[0].codigoCargo;
+            this.salario = response.data[0].salario;
+            this.detalles = response.data[0].detalles;
+
+            this.esEdit = true;
+          })
+          .catch((err) => console.log(err.message));
+      }
     }
   },
   mounted() {
@@ -191,15 +255,13 @@ export default {
     getEstados()
       .then(response => this.estadosLista = response.data)
       .catch(err => console.error(err.response.data.message));
+
+    getEmpleados()
+      .then((response) => this.empleadosLista = response.data)
+      .catch(err => console.error(err));
+
+    this.getContrato()
   },
-  watch: {
-    contratoRegistrado(nuevo) {
-      console.log('Limpiando campos:', nuevo);
-      if(nuevo) {
-        this.limpiarCampos();
-      }
-    }
-  }
 };
 </script>
 

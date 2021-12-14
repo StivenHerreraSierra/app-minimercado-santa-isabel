@@ -21,10 +21,11 @@
 export default {
   data: () => ({
     links: [
-      ["mdi-truck", "Contratos", "/contratos"],
-      ["mdi-currency-usd", "Empleados", "/empleados"],
-      ["mdi-wallet-giftcard", "Recursos", "/recursos"],
-      ["mdi-shopping-outline", "Ventas", "/ventas"],
+      ["mdi-file-document-outline", "Contratos", "/contratos"],
+      ["mdi-account-multiple-outline", "Empleados", "/empleados"],
+      ["mdi-cart-outline", "Clientes", "/clientes"],
+      ["mdi-basket-outline", "Ventas", "/ventas"],
+      ["mdi-chart-pie", "Reportes", "/reportes"],
     ],
   }),
 };

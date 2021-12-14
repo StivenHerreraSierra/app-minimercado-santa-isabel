@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import CardPersona from "./CardPersona.vue";
+import CardPersona from "./CardEmpleado.vue";
 export default {
     components: {
       CardPersona,

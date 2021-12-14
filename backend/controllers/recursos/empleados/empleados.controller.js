@@ -13,7 +13,7 @@ module.exports = class Empleado {
     }
 
     static getAllFiltered(req, res) {
-        const sql = "SELECT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento "
+        const sql = "SELECT DISTINCT numeroDocumento, nombreCompleto, direccionResidencia, TipoDocumento_idTipoDocumento "
                 + "FROM Empleado e "
                 + "JOIN TelefonoEmpleado t "
                 + "ON e.numeroDocumento = t.Empleado_numeroDocumento "
